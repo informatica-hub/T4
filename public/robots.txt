@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+
+Disallow: /admin
+Disallow: /admin/
+Disallow: /auth
+Disallow: /registro
+Disallow: /reset-password
+Disallow: /carrito
+Disallow: /cotizar
+Disallow: /certificado/
+
+Sitemap: https://t4mexico.com/sitemap.xml

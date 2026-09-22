@@ -1,0 +1,66 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Node
+node_modules
+dist
+dist-ssr
+.npm
+.yarn
+.pnp.*
+
+# Editor
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Variables de entorno (NUNCA en Git)
+.env
+.env.local
+.env.production
+.env.development
+.env.*.local
+*.local
+
+# Python / venv
+venv/
+.venv/
+env/
+ENV/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+pip-log.txt
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+
+# Backups y datos sensibles
+*.dump
+*.sql.gz
+*.sqlite
+backup_supabase_*.dump
+backupbucket/
+Respaldo migracion/
+cargadeusuarios.xlsx
+cargar_usuarios_*.py
+test_conexion.py
+
+# Supabase temporales
+supabase/.temp/
+supabase/.branches/

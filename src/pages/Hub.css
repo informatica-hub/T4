@@ -1,0 +1,317 @@
+.hub-app {
+  --ink: #404d54;
+  --muted: #404d54;
+  --paper: #f5f7f3;
+  --card: #fff;
+  --sage: #4A5857;
+  --lime: #d2dc63;
+  --cyan: #77bfd2;
+  --line: #dce3dc;
+  --shadow: 0 18px 50px rgba(38, 52, 60, .10);
+
+  background: transparent;
+  color: var(--ink);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 1.45;
+
+  max-width: 80%;               /* aumentado de 60% a 80% */
+  margin: 0 auto;
+  padding: 60px 30px 60px;      /* reducido drásticamente (antes 200px) */
+}
+
+.hub-app * {
+  box-sizing: border-box;
+}
+
+.hub-app a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Encabezado */
+.hub-header {
+  margin-bottom: 28px;
+}
+
+.hub-eyebrow {
+  font-size: .76rem;
+  text-transform: uppercase;
+  letter-spacing: .14em;
+  font-weight: 800;
+  color: var(--sage);
+}
+
+.hub-app h1 {
+  font-size: clamp(1.8rem, 3vw, 2.8rem);
+  line-height: .98;
+  letter-spacing: -.055em;
+  margin: 14px 0 10px;
+  max-width: 800px;
+}
+
+.hub-app h1 span {
+  color: var(--sage);
+}
+
+.hub-lead {
+  font-size: 0.95rem;
+  color: var(--muted);
+  max-width: 690px;
+  margin: 0;
+}
+
+/* Cuadrícula de tarjetas: SIEMPRE en fila, centradas y con scroll solo si es necesario */
+.hub-grid {
+  display: flex;
+  flex-wrap: nowrap;           /* Nunca saltan a otra línea */
+  justify-content: center;     /* Centra las tarjetas horizontalmente */
+  overflow-x: auto;            /* Permite desplazamiento horizontal cuando no quepan */
+  gap: 18px;
+  padding-bottom: 8px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  align-items: stretch;
+}
+
+/* Ocultar barra de scroll en WebKit (opcional) */
+.hub-grid::-webkit-scrollbar {
+  height: 8px;
+}
+
+.hub-grid::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+}
+
+.hub-grid::-webkit-scrollbar-thumb {
+  background: var(--sage);
+  border-radius: 4px;
+}
+
+/* Tarjeta individual: ALTA y ESTRECHA */
+.hub-card {
+  flex: 0 0 200px;             /* antes 220px */
+  min-height: 300px;           /* antes 320px */
+  background: var(--card);
+  border: 3px solid var(--line);
+  border-radius: 20px;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.hub-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--sage);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.hub-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--sage);
+}
+
+.hub-card:hover::before {
+  opacity: 1;
+}
+
+.hub-card-icon {
+  font-size: 2.8rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.hub-card-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+}
+
+.hub-card-title-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.hub-card h2 {
+  font-size: 1.1rem;
+  margin: 0;
+  letter-spacing: -.02em;
+  color: var(--ink);
+}
+
+.hub-badge {
+  background: var(--lime);
+  color: var(--ink);
+  font-size: .65rem;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+}
+
+.hub-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: .85rem;
+  line-height: 1.5;
+}
+
+.hub-card-arrow {
+  font-size: 1.5rem;
+  color: var(--sage);
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.hub-card:hover .hub-card-arrow {
+  transform: translateY(4px);
+}
+
+/* Pie de página */
+.hub-footer {
+  margin-top: 28px;
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  color: var(--muted);
+  font-size: .72rem;
+  border-top: 1px solid var(--line);
+  padding-top: 16px;
+}
+
+/* ========== RESPONSIVE ========== */
+
+/* Tablets: se mantienen en fila, contenedor más ancho */
+@media (max-width: 1024px) {
+  .hub-app {
+    max-width: 90%;
+  }
+
+  .hub-card {
+    flex: 0 0 180px;
+    min-height: 280px;
+  }
+}
+
+/* Móviles: se mantienen en fila y scroll horizontal */
+@media (max-width: 768px) {
+  .hub-app {
+    max-width: 100%;
+    padding: 20px;
+  }
+
+  .hub-grid {
+    justify-content: flex-start;  /* Cambia a inicio para que el scroll funcione bien */
+  }
+
+  .hub-card {
+    flex: 0 0 70vw;
+    min-height: 260px;
+    max-width: 240px;
+  }
+
+  .hub-app h1 {
+    font-size: clamp(1.5rem, 6vw, 2rem);
+  }
+
+  .hub-footer {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+/* Móviles muy pequeños */
+@media (max-width: 480px) {
+  .hub-app {
+    padding: 15px;
+  }
+
+  .hub-card {
+    flex: 0 0 80vw;
+    min-height: 240px;
+  }
+}
+
+.download-indicator {
+  display: inline-block;
+  background: #4CAF50;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 400;
+  margin-top: 40px;
+  transition: all 0.3s ease;
+}
+
+.hub-card:hover .download-indicator {
+  background: #45a049;
+  transform: scale(1.05);
+}
+
+.quality-content {
+  max-width: 900px;
+  margin: 0 auto;
+  text-align: center;
+  padding: 0 0 20px;
+}
+.quality-icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%; /* Asegura que ocupe todo el ancho */
+  margin-bottom: 24px;
+}
+
+.quality-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 24px;
+  line-height: 1.2;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .quality-section {
+    padding: 60px 16px;
+  }
+
+  .quality-title {
+    font-size: 2rem;
+  }
+
+  .quality-description {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .quality-title {
+    font-size: 1.75rem;
+  }
+
+  .quality-description {
+    font-size: 1rem;
+  }
+}

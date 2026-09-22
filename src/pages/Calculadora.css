@@ -1,0 +1,2663 @@
+/* Calculadora.css - Versión final corregida */
+.calculadora-app {
+  --ink: #404d54;
+  --muted: #404d54;
+  --paper: #f5f7f3;
+  --card: #fff;
+  --sage: #799458;
+  --lime: #d2dc63;
+  --cyan: #77bfd2;
+  --line: #dce3dc;
+  --warn: #fff4cf;
+  --warn-ink: #735c00;
+  --shadow: 0 18px 50px rgba(38, 52, 60, .10);
+  
+  background: transparent;
+  color: var(--ink);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 1.45;
+  
+  /* CORREGIDO: 50% de ancho, centrado, sin padding excesivo */
+  max-width: 50%;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.calculadora-app * {
+  box-sizing: border-box;
+}
+
+.calculadora-app button,
+.calculadora-app input,
+.calculadora-app select {
+  font: inherit;
+}
+
+.calculadora-app button {
+  cursor: pointer;
+}
+
+.calculadora-app .shell {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 0;
+}
+
+.calculadora-app header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.calculadora-app .brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.calculadora-app .mark {
+  width: 48px;
+  height: 48px;
+  border: 3px solid var(--ink);
+  border-radius: 50%;
+  position: relative;
+}
+
+.calculadora-app .mark:after {
+  content: "";
+  position: absolute;
+  width: 11px;
+  height: 11px;
+  background: var(--lime);
+  border-radius: 50%;
+  right: -3px;
+  bottom: 3px;
+  border: 3px solid var(--paper);
+}
+
+.calculadora-app .eyebrow {
+  font-size: .76rem;
+  text-transform: uppercase;
+  letter-spacing: .14em;
+  font-weight: 800;
+  color: var(--sage);
+}
+
+.calculadora-app h1 {
+  font-size: clamp(1.8rem, 3vw, 2.8rem);
+  line-height: .98;
+  letter-spacing: -.055em;
+  margin: 14px 0 10px;
+  max-width: 800px;
+}
+
+.calculadora-app h1 span {
+  color: var(--sage);
+}
+
+.calculadora-app .lead {
+  font-size: 0.95rem;
+  color: var(--muted);
+  max-width: 690px;
+  margin: 0;
+}
+
+.calculadora-app .badge {
+  white-space: nowrap;
+  background: #e8ece7;
+  border: 1px solid var(--line);
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: .78rem;
+  font-weight: 750;
+}
+
+.calculadora-app .tabs {
+  display: inline-flex;
+  background: #e6ebe5;
+  padding: 5px;
+  border-radius: 15px;
+  margin: 20px 0 16px;
+  gap: 4px;
+}
+
+.calculadora-app .tab {
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  padding: 9px 14px;
+  border-radius: 11px;
+  font-weight: 750;
+  font-size: 0.9rem;
+}
+
+.calculadora-app .tab.active {
+  background: white;
+  color: var(--ink);
+  box-shadow: 0 4px 15px rgba(38, 52, 60, .08);
+}
+
+.calculadora-app .panel {
+  display: none;
+}
+
+.calculadora-app .panel.active {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(320px, 1fr);
+  gap: 18px;
+  align-items: start; /* CORREGIDO: start en vez de center */
+}
+
+.calculadora-app .card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: var(--shadow);
+}
+
+.calculadora-app .card h2 {
+  font-size: 1.1rem;
+  margin: 0 0 4px;
+  letter-spacing: -.02em;
+}
+
+.calculadora-app .sub {
+  color: var(--muted);
+  font-size: .85rem;
+  margin: 0 0 18px;
+}
+
+.calculadora-app .grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.calculadora-app .full {
+  grid-column: 1/-1;
+}
+
+.calculadora-app label {
+  display: block;
+  font-size: .78rem;
+  font-weight: 800;
+  margin-bottom: 5px;
+}
+
+.calculadora-app .field {
+  display:flex;
+  border: 1.5px solid var(--line);
+  border-radius: 11px;
+  overflow: visible;
+  background: #fbfcfa;
+  transition: .2s;
+  padding: 0;
+ 
+}
+
+.calculadora-app .field:focus-within {
+  border-color: var(--sage);
+  box-shadow: 0 0 0 3px rgba(116, 136, 124, .12);
+}
+
+.calculadora-app input,
+.calculadora-app select {
+  min-width: 100px;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  outline: 0;
+  padding: 5px 10px;
+  width: 100%;
+  font-size: 0.9rem;
+   flex: 1; 
+}
+
+.calculadora-app select {
+  min-width: 79px;  /* Aumenta un poco más para "nmol" */
+  width: auto;
+  border-left: 1px solid var(--line);
+  font-weight: 700;
+  color: var(--muted);
+  padding: 10px 28px 10px 10px;  /* Espacio para la flecha */
+  
+  /* Flecha personalizada */
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23404d54' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 15px center;
+  background-size: 12px 8px;
+  cursor: pointer;
+  background-color: transparent;
+}
+
+.calculadora-app input::placeholder {
+  color: #a4ada7;
+}
+
+.calculadora-app .choice {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.calculadora-app .choice button {
+  border: 1.5px solid var(--line);
+  background: #fbfcfa;
+  padding: 10px;
+  border-radius: 10px;
+  font-weight: 750;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.calculadora-app .choice button.selected {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: white;
+}
+
+.calculadora-app .result {
+  background: var(--ink);
+  color: white;
+  position: sticky;
+  top: 20px;
+  overflow: visible;  /* Cambia de 'hidden' a 'visible' */
+  padding: 30px;  /* Aumenta el padding de 20px a 30px */
+  min-height: 300px;  /* Añade una altura mínima */
+}
+
+.calculadora-app .result:before {
+  content: "";
+  position: absolute;
+  width: 0px;
+  height: 0px;
+  border: 0px solid rgba(201, 235, 67, .12);
+  border-radius: 50%;
+  right: -75px;
+  top: -90px;
+}
+
+.calculadora-app .result .sub {
+  color: #bfc9c3;
+}
+
+.calculadora-app .result-label {
+  font-size: .7rem;
+  text-transform: uppercase;
+  letter-spacing: .13em;
+  color: var(--lime);
+  font-weight: 850;
+  margin-top: 20px;
+}
+
+.calculadora-app .big {
+  font-size: clamp(1.8rem, 3.5vw, 3rem);
+  letter-spacing: -.06em;
+  line-height: 1;
+  font-weight: 820;
+  margin: 6px 0 10px;
+  
+}
+
+.calculadora-app .big small {
+  font-size: .29em;
+  letter-spacing: 0;
+  color: #d7dfda;
+  margin-left: 6px;
+}
+
+.calculadora-app .instruction {
+  border-top: 1px solid rgba(255, 255, 255, .16);
+  padding-top: 14px;
+  margin-top: 16px;
+  font-size: 0.9rem;
+}
+
+.calculadora-app .instruction strong {
+  color: var(--lime);
+}
+
+.calculadora-app .formula {
+  margin-top: 14px;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, .07);
+  border-radius: 10px;
+  color: #d6ded9;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: .78rem;
+}
+
+.calculadora-app .warning {
+  display: none;
+  margin-top: 12px;
+  background: var(--warn);
+  color: var(--warn-ink);
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: .82rem;
+  font-weight: 650;
+}
+
+.calculadora-app .warning.show {
+  display: block;
+}
+
+.calculadora-app .guide.panel.active {
+  display: block;
+}
+
+.calculadora-app .guide-card {
+  max-width: 100%;
+}
+
+.calculadora-app .source-note {
+  background: #edf1ec;
+  border: 1px solid var(--line);
+  padding: 12px 14px;
+  border-radius: 10px;
+  color: var(--muted);
+  font-size: .82rem;
+  margin: 14px 0 20px;
+}
+
+.calculadora-app .definition {
+  background: var(--lime);
+  padding: 16px 18px;
+  border-radius: 14px;
+  margin-bottom: 18px;
+}
+
+.calculadora-app .definition p {
+  margin: 0 0 10px;
+  font-size: 0.9rem;
+}
+
+.calculadora-app .definition p:last-child {
+  margin-bottom: 0;
+}
+
+.calculadora-app .guide h3 {
+  font-size: 1rem;
+  margin: 20px 0 12px;
+}
+
+.calculadora-app .protocol {
+  counter-reset: protocol;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.calculadora-app .protocol li {
+  counter-increment: protocol;
+  padding: 12px 0 12px 40px;
+  border-bottom: 1px solid var(--line);
+  position: relative;
+  font-size: 0.9rem;
+}
+
+.calculadora-app .protocol li:before {
+  content: counter(protocol);
+  position: absolute;
+  left: 0;
+  top: 10px;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--ink);
+  color: white;
+  font-weight: 850;
+  font-size: 0.8rem;
+}
+
+.calculadora-app .ready {
+  font-size: 1rem;
+  font-weight: 800;
+  background: #e8f3f5;
+  border-left: 5px solid var(--cyan);
+  padding: 14px 16px;
+  margin: 18px 0;
+  border-radius: 0 10px 10px 0;
+}
+
+.calculadora-app .notes {
+  padding-left: 18px;
+}
+
+.calculadora-app .notes li {
+  margin: 0 0 12px;
+  padding-left: 3px;
+  font-size: 0.9rem;
+}
+
+.calculadora-app .storage-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin: 0 0 20px;
+}
+
+.calculadora-app .storage-item {
+  padding: 14px;
+  border-radius: 14px;
+  background: #e5ebe6;
+  border: 1px solid var(--line);
+}
+
+.calculadora-app .storage-item strong {
+  display: block;
+  font-size: .85rem;
+  margin-bottom: 10px;
+}
+
+.calculadora-app .storage-item .temp {
+  font-size: 0.95rem;
+  font-weight: 850;
+}
+
+.calculadora-app .storage-item p {
+  color: var(--muted);
+  font-size: .78rem;
+  margin: 6px 0 0;
+}
+
+.calculadora-app .steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.calculadora-app .tip {
+  background: #edf1ec;
+  border: 1px solid var(--line);
+  padding: 14px;
+  border-radius: 14px;
+}
+
+.calculadora-app .n {
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--lime);
+  font-size: .7rem;
+  font-weight: 900;
+  margin-bottom: 10px;
+}
+
+.calculadora-app .tip strong {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 0.9rem;
+}
+
+.calculadora-app .tip p {
+  margin: 0;
+  color: var(--muted);
+  font-size: .82rem;
+}
+
+.calculadora-app footer {
+  margin-top: 24px;
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  color: var(--muted);
+  font-size: .72rem;
+  border-top: 1px solid var(--line);
+  padding-top: 16px;
+}
+
+
+
+/* ======================================== */
+/* NUEVAS SECCIONES - Área de trabajo y Stock */
+/* ======================================== */
+
+/* Recomendaciones para el área de trabajo */
+.calculadora-app .work-area-tips {
+  margin: 16px 0 24px;
+}
+
+.calculadora-app .tip-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.calculadora-app .tip-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: #f8faf8;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  transition: all 0.2s ease;
+}
+
+.calculadora-app .tip-item:hover {
+  background: #f0f4f0;
+  border-color: var(--sage);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.calculadora-app .tip-icon {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+  line-height: 1.2;
+  margin-top: 2px;
+}
+
+.calculadora-app .tip-item p {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--ink);
+  line-height: 1.5;
+}
+
+.calculadora-app .tip-item strong {
+  color: var(--sage);
+  font-weight: 700;
+}
+
+/* Preparación de stock y alícuotas */
+.calculadora-app .stock-preparation {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin: 16px 0 24px;
+}
+
+.calculadora-app .stock-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  background: linear-gradient(135deg, #f8faf8 0%, #edf1ec 100%);
+  padding: 18px 20px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  transition: all 0.3s ease;
+}
+
+.calculadora-app .stock-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(121, 148, 88, 0.15);
+  border-color: var(--sage);
+}
+
+.calculadora-app .stock-icon {
+  font-size: 2rem;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.calculadora-app .stock-card strong {
+  display: block;
+  font-size: 0.95rem;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+
+.calculadora-app .stock-card p {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+
+/* --- Contenedor principal del resultado --- */
+.calculadora-app .result-display {
+  display: flex;
+  align-items: stretch;
+  gap: 20px;
+  margin: 15px 0 10px;
+  min-height: 160px;
+  justify-content: center;
+}
+
+/* --- Detalles del resultado (texto a la derecha) --- */
+.calculadora-app .result-details {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-right: 10px;
+}
+
+
+
+
+
+
+/* ======================================== */
+/* TUBO DE ENSAYO ANIMADO - ESTILO CRIOTUBO */
+/* ======================================== */
+
+/* --- Contenedor del criotubo --- */
+.calculadora-app .tube-container {
+  flex-shrink: 0;
+  width: 90px;
+  height: 180px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+/* --- El criotubo (forma rectangular) --- */
+.calculadora-app .tube {
+  position: relative;
+  width: 60px;
+  height: 160px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 3px solid rgba(255, 255, 255, 0.4);
+  border-radius: 4px 4px 12px 12px; /* Esquinas ligeramente redondeadas */
+  border-top: none;
+  overflow: hidden;
+  box-shadow: 
+    inset 0 0 20px rgba(0, 0, 0, 0.08),
+    0 4px 12px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(2px);
+}
+
+/* --- TAPA TIPO TAPÓN DE ROSCA --- */
+.tube-v2::before {
+  content: "";
+  position: absolute;
+  top: -30px;
+  right: -4px;
+  transform: translateX(-50%);
+  width: 52px;
+  height: 28px;
+  background: radial-gradient(ellipse at 50% 30%, 
+    rgba(255, 255, 255, 0.3) 0%,
+    rgba(255, 255, 255, 0.15) 40%,
+    rgba(255, 255, 255, 0.05) 80%,
+    rgba(255, 255, 255, 0.2) 100%
+  );
+  border: 2.5px solid rgba(255, 255, 255, 0.4);
+  border-radius: 8px 8px 3px 3px;
+  box-shadow: 
+    0 -4px 15px rgba(0, 0, 0, 0.12),
+    inset 0 3px 10px rgba(255, 255, 255, 0.25),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.06);
+  z-index: 10;
+}
+
+/* --- ROSCA (líneas en espiral simuladas) --- */
+.tube-v2::after {
+  content: "";
+  position: absolute;
+  top: -21px;
+  right: -4px;
+  transform: translateX(-50%);
+  width: 44px;
+  height: 18px;
+  background: 
+    repeating-linear-gradient(
+      90deg,
+      transparent 0px,
+      transparent 4px,
+      rgba(255, 255, 255, 0.1) 4px,
+      rgba(255, 255, 255, 0.1) 5px,
+      transparent 5px,
+      transparent 9px,
+      rgba(255, 255, 255, 0.06) 9px,
+      rgba(255, 255, 255, 0.06) 10px,
+      transparent 10px,
+      transparent 14px
+    );
+  z-index: 11;
+  border-radius: 5px 5px 0 0;
+  pointer-events: none;
+  opacity: 0.8;
+}
+
+/* --- Líquido dentro del criotubo --- */
+.calculadora-app .tube-liquid {
+  position: absolute;
+  bottom: 0;
+  left: 2px;
+  width: calc(100% - 4px);
+  height: 60%;
+  background: linear-gradient(180deg, 
+    rgba(210, 220, 99, 0.85) 0%, 
+    rgba(121, 148, 88, 0.95) 100%
+  );
+  transition: height 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 0 0 10px 10px;
+  box-shadow: inset 0 8px 20px rgba(255, 255, 255, 0.15);
+  min-height: 8px;
+}
+
+/* --- Superficie del líquido (efecto de menisco en rectángulo) --- */
+.calculadora-app .tube-meniscus {
+  position: absolute;
+  top: -3px;
+  left: -1px;
+  width: calc(100% + 2px);
+  height: 6px;
+  background: radial-gradient(ellipse at center, 
+    rgba(255, 255, 255, 0.3) 0%, 
+    rgba(255, 255, 255, 0.05) 60%,
+    transparent 100%
+  );
+  filter: blur(1px);
+}
+
+/* --- Etiqueta del volumen dentro del tubo --- */
+.calculadora-app .tube-volume-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-weight: 800;
+  font-size: 0.85rem;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  z-index: 3;
+  pointer-events: none;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 4px 10px;
+  border-radius: 8px;
+  backdrop-filter: blur(6px);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  font-family: 'Inter', sans-serif;
+  letter-spacing: 0.5px;
+}
+
+.calculadora-app .tube:hover .tube-volume-label {
+  opacity: 1;
+}
+
+/* --- Versión en modo warning (volumen alto) --- */
+.calculadora-app .tube-liquid.warning {
+  background: linear-gradient(180deg, 
+    rgba(255, 70, 70, 0.95) 0%, 
+    rgba(200, 30, 30, 0.98) 100%
+  ) ;
+  animation: pulse-warning 1.5s ease-in-out infinite;
+}
+
+.calculadora-app .tube-liquid.warning .tube-meniscus {
+  background: radial-gradient(ellipse at center, 
+    rgba(255, 70, 70, 0.4) 0%, 
+    transparent 70%
+  ) ;
+}
+
+@keyframes pulse-warning {
+  0%, 100% { 
+    opacity: 1; 
+  }
+  50% { 
+    opacity: 0.85; 
+    box-shadow: inset 0 0 40px rgba(255, 0, 0, 0.4), 0 0 20px rgba(255, 0, 0, 0.2);
+  }
+}
+
+
+
+@media (max-width: 480px) {
+  .calculadora-app .tube-container {
+    width: 60px;
+    height: 130px;
+  }
+
+  .calculadora-app .tube {
+    width: 40px;
+    height: 110px;
+  }
+
+  .calculadora-app .tube::before {
+    width: 52px;
+    height: 12px;
+    top: -8px;
+    left: -6px;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+/* ======================================== */
+/* MEDIA QUERIES - Responsive */
+/* ======================================== */
+
+
+
+/* ============================================ */
+/* FIX PARA PANTALLAS MEDIANAS (1024px - 1366px) */
+/* ============================================ */
+@media (max-width: 1366px) and (min-width: 1024px) {
+  
+  /* === CONTENEDORES Y GRID === */
+  .calculadora-app .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  
+  .calculadora-app .grid > div {
+    min-width: 0; /* Permite que los elementos se encojan */
+    overflow: hidden; /* Evita desbordamientos */
+  }
+  
+  /* === CAMPOS DE ENTRADA === */
+  .calculadora-app .field {
+    display: flex;
+    width: 100%;
+    border-radius: 8px;
+    overflow: hidden; /* Evita que el contenido se salga */
+    background: #fbfcfa;
+  }
+  
+  /* === INPUT (número) === */
+  .calculadora-app input[type="number"],
+  .calculadora-app input[type="text"] {
+    min-width: 50px;
+    padding: 4px 6px;
+    font-size: 0.7rem;
+    flex: 1;
+    border: 0;
+    background: transparent;
+    outline: 0;
+  }
+  
+  /* === SELECT (unidades) === */
+  .calculadora-app select {
+    min-width: 40px !important;
+    width: auto !important;
+    max-width: 60px;
+    padding: 4px 16px 4px 4px !important;
+    font-size: 0.6rem !important;
+    font-weight: 700;
+    border-left: 1px solid var(--line);
+    background-position: right 4px center !important;
+    background-size: 8px 6px !important;
+    flex-shrink: 0;
+    text-overflow: clip !important;
+    overflow: visible !important; 
+    white-space: nowrap;
+  }
+  
+  /* === ETIQUETAS === */
+  .calculadora-app label {
+    font-size: 0.6rem !important;
+    font-weight: 800;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  /* === TÍTULOS DE LAS TARJETAS === */
+  .calculadora-app .card h2 {
+    font-size: 0.85rem;
+    margin: 0 0 2px;
+  }
+  
+  .calculadora-app .sub {
+    font-size: 0.65rem;
+    margin-bottom: 8px;
+  }
+  
+  /* === BOTONES DE OPCIÓN (Medio de resuspensión) === */
+  .calculadora-app .choice {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+  }
+  
+  .calculadora-app .choice button {
+    padding: 4px 6px;
+    font-size: 0.65rem;
+    border-radius: 6px;
+    white-space: nowrap;
+  }
+  
+  /* === AJUSTE DEL PANEL PRINCIPAL === */
+  .calculadora-app .panel.active {
+    grid-template-columns: 1.2fr 1fr;
+    gap: 10px;
+  }
+  
+  /* === TARJETA DE RESULTADOS === */
+  .calculadora-app .result {
+    padding: 14px;
+    min-height: 200px;
+  }
+  
+  /* === TEXTO DE INSTRUCCIONES === */
+  .calculadora-app .instruction {
+    font-size: 0.75rem;
+    padding-top: 10px;
+    margin-top: 10px;
+    line-height: 1.4;
+    word-wrap: break-word;
+  }
+  
+  /* === FORMULA === */
+  .calculadora-app .formula {
+    font-size: 0.6rem;
+    padding: 6px 8px;
+  }
+
+  .calculadora-app select option {
+    font-size: 0.7rem;
+    padding: 2px 4px;
+    white-space: nowrap;
+  }
+
+
+    .calculadora-app input {
+    min-width: 50px !important;
+    padding: 4px 4px !important;
+    font-size: 0.7rem !important;
+    flex: 0.7; /* Reduce el espacio que ocupa */
+  }
+
+}
+
+
+
+
+
+
+
+
+
+
+/* Ajuste para pantallas medianas (laptops pequeñas) */
+@media (max-width: 1280px) and (min-width: 1025px) {
+  /* 1. Reducir el tamaño general de los campos */
+  .calculadora-app .field {
+    min-width: 0; /* Permite que se encoja más */
+    flex-wrap: nowrap;
+  }
+  
+  /* 2. Input más pequeño */
+  .calculadora-app input {
+    min-width: 60px; /* Reducido de 100px */
+    padding: 6px 8px; /* Reducido */
+    font-size: 0.75rem; /* Reducido */
+    flex: 1;
+  }
+  
+  /* 3. Select más pequeño y con padding ajustado */
+  .calculadora-app select {
+    min-width: 50px; /* Reducido significativamente */
+    width: auto;
+    padding: 6px 22px 6px 6px; /* Menos padding a la izquierda, más a la derecha para la flecha */
+    font-size: 0.7rem; /* Reducido */
+    border-left: 1px solid var(--line);
+    background-position: right 8px center; /* Ajustar posición de la flecha */
+    background-size: 10px 7px;
+  }
+  
+  /* 4. El grid debe permitir que los campos se ajusten */
+  .calculadora-app .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px; /* Menos espacio entre elementos */
+  }
+  
+  /* 5. Cada elemento del grid debe usar todo el espacio disponible */
+  .calculadora-app .grid > * {
+    min-width: 0; /* Permite que se encoja */
+  }
+  
+  /* 6. Los campos deben ocupar todo el ancho */
+  .calculadora-app .field {
+    display: flex;
+    width: 100%;
+  }
+  
+  /* 7. Ajustar la etiqueta */
+  .calculadora-app label {
+    font-size: 0.65rem;
+    margin-bottom: 2px;
+    white-space: nowrap; /* Evita que el texto se rompa */
+  }
+  
+  /* 8. Títulos y textos más pequeños */
+  .calculadora-app .card h2 {
+    font-size: 0.9rem;
+  }
+  
+  .calculadora-app .sub {
+    font-size: 0.7rem;
+    margin-bottom: 10px;
+  }
+}
+
+
+
+
+
+
+/* Tablets - 50% se vuelve más ancho */
+@media (max-width: 1024px) {
+  .calculadora-app {
+    max-width: 70%; /* Un poco más ancho en tablet */
+    padding: 15px;
+  }
+  
+  .calculadora-app .panel.active {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .calculadora-app .result {
+    position: relative;
+    top: 0;
+  }
+}
+
+/* Móviles - Ocupa 100% */
+@media (max-width: 768px) {
+  .calculadora-app {
+    max-width: 100%; /* En móvil ocupa todo el ancho */
+    padding: 10px;
+    margin: 0;
+  }
+  
+  .calculadora-app .shell {
+    padding: 0;
+  }
+  
+  .calculadora-app header {
+    display: block;
+    margin-bottom: 16px;
+  }
+  
+  .calculadora-app header a {
+    display: inline-block;
+    margin-bottom: 8px;
+  }
+  
+  .calculadora-app header img {
+    width: 60px !important;
+    height: 60px !important;
+  }
+  
+  .calculadora-app h1 {
+    font-size: clamp(1.5rem, 5vw, 2rem);
+    margin: 10px 0 8px;
+  }
+  
+  .calculadora-app .lead {
+    font-size: 0.85rem;
+  }
+  
+  .calculadora-app .tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    width: 100%;
+    padding: 4px;
+    gap: 3px;
+    margin: 12px 0;
+  }
+  
+  .calculadora-app .tab {
+    padding: 8px 4px;
+    font-size: 0.72rem;
+    text-align: center;
+  }
+  
+  .calculadora-app .panel.active {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .calculadora-app .card {
+    padding: 14px;
+    border-radius: 14px;
+  }
+  
+  .calculadora-app .card h2 {
+    font-size: 1rem;
+  }
+  
+  .calculadora-app .sub {
+    font-size: 0.8rem;
+    margin-bottom: 14px;
+  }
+  
+  .calculadora-app .grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  
+  .calculadora-app .full {
+    grid-column: auto;
+  }
+  
+  .calculadora-app .field input,
+  .calculadora-app .field select {
+    padding: 7px 8px;
+    font-size: 0.85rem;
+  }
+  
+  .calculadora-app .choice {
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+  
+  .calculadora-app .choice button {
+    padding: 8px;
+    font-size: 0.78rem;
+  }
+  
+  .calculadora-app .result {
+    position: relative;
+    top: 0;
+    padding: 16px;
+  }
+  
+  .calculadora-app .result-label {
+    font-size: 0.65rem;
+    margin-top: 12px;
+  }
+  
+  .calculadora-app .big {
+    font-size: clamp(1.8rem, 8vw, 2.8rem);
+    margin: 4px 0 8px;
+  }
+  
+  .calculadora-app .instruction {
+    font-size: 0.95rem;
+    padding-top: 14px;
+    margin-top: 16px;
+
+     line-height: 1.6;  /* Mejora la legibilidad */
+  word-wrap: break-word;  /* Permite que el texto se divida en varias líneas */
+  overflow-wrap: break-word;
+  }
+  
+  .calculadora-app .formula {
+    font-size: 0.7rem;
+    padding: 8px 10px;
+  }
+  
+  .calculadora-app .storage-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  
+  .calculadora-app .storage-item {
+    padding: 12px;
+  }
+  
+  .calculadora-app .steps {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-top: 16px;
+  }
+  
+  .calculadora-app .tip {
+    padding: 12px;
+  }
+  
+  .calculadora-app .guide h3 {
+    font-size: 0.95rem;
+    margin: 16px 0 10px;
+  }
+  
+  .calculadora-app .protocol li {
+    padding: 10px 0 10px 36px;
+    font-size: 0.85rem;
+  }
+  
+  .calculadora-app .protocol li:before {
+    width: 22px;
+    height: 22px;
+    font-size: 0.7rem;
+    top: 8px;
+  }
+  
+  .calculadora-app .ready {
+    font-size: 0.9rem;
+    padding: 12px 14px;
+    margin: 14px 0;
+  }
+  
+  .calculadora-app .notes li {
+    font-size: 0.85rem;
+    margin-bottom: 10px;
+  }
+  
+  .calculadora-app .definition {
+    padding: 14px;
+  }
+  
+  .calculadora-app .definition p {
+    font-size: 0.85rem;
+  }
+  
+  .calculadora-app footer {
+    display: block;
+    text-align: center;
+    margin-top: 16px;
+    padding-top: 12px;
+    font-size: 0.65rem;
+  }
+  
+  .calculadora-app footer span {
+    display: block;
+    margin-bottom: 4px;
+  }
+
+
+.calculadora-app .tip-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .calculadora-app .stock-preparation {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .calculadora-app .tip-item {
+    padding: 12px 14px;
+  }
+
+  .calculadora-app .tip-item p {
+    font-size: 0.82rem;
+  }
+
+  .calculadora-app .stock-card {
+    padding: 14px 16px;
+  }
+
+  .calculadora-app .stock-card p {
+    font-size: 0.82rem;
+  }
+
+  .calculadora-app .stock-icon {
+    font-size: 1.6rem;
+  }
+
+
+
+
+
+}
+
+/* Móviles muy pequeños */
+@media (max-width: 480px) {
+  .calculadora-app {
+    padding: 6px;
+  }
+  
+  .calculadora-app h1 {
+    font-size: 1.3rem;
+  }
+  
+  .calculadora-app .tab {
+    font-size: 0.65rem;
+    padding: 6px 2px;
+  }
+  
+  .calculadora-app .card {
+    padding: 10px;
+  }
+  
+  .calculadora-app .result .big {
+    font-size: 1.5rem;
+  }
+
+
+   .calculadora-app .tip-item {
+    padding: 10px 12px;
+  }
+
+  .calculadora-app .tip-icon {
+    font-size: 1.2rem;
+  }
+
+  .calculadora-app .stock-card {
+    padding: 12px 14px;
+  }
+
+  
+}
+
+
+/* ======================================== */
+/* ANIMACIONES DEL LÍQUIDO EN EL TUBO        */
+/* ======================================== */
+
+
+/* --- Animación de burbujas --- */
+@keyframes bubble-rise {
+  0% {
+    opacity: 0;
+    transform: translateY(0) scale(0.5);
+  }
+  20% {
+    opacity: 0.6;
+  }
+  80% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-80px) scale(1.2);
+  }
+}
+
+/* --- Animación de burbujas en modo warning (más rápido) --- */
+@keyframes bubble-rise-warning {
+  0% {
+    opacity: 0;
+    transform: translateY(0) scale(0.5);
+  }
+  15% {
+    opacity: 0.7;
+  }
+  70% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-80px) scale(1.3);
+  }
+}
+
+/* --- Animación de pulsación del líquido (modo warning) --- */
+@keyframes pulse-warning {
+  0%, 100% { 
+    opacity: 1; 
+  }
+  50% { 
+    opacity: 0.85; 
+    box-shadow: inset 0 0 40px rgba(255, 0, 0, 0.4), 0 0 20px rgba(255, 0, 0, 0.2);
+  }
+}
+
+/* --- Líquido con ondas --- */
+.calculadora-app .tube-liquid {
+  position: absolute !important;
+  bottom: 0 !important; /* 👈 FORZAR al fondo */
+  left: 2px;
+  width: calc(100% - 4px);
+  height: 60%;
+  border-radius: 0 0 10px 10px;
+  min-height: 8px;
+  transform-origin: bottom center;
+  /* 👈 ELIMINA la animación liquid-wave */
+}
+
+/* --- Las burbujas dentro del líquido --- */
+.calculadora-app .tube-bubbles {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 0 0 10px 10px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.calculadora-app .bubble {
+  position: absolute;
+  bottom: 10%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.05));
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  pointer-events: none;
+  animation: bubble-rise 3s ease-in infinite;
+}
+
+.calculadora-app .bubble:nth-child(1) {
+  left: 15%;
+  width: 8px;
+  height: 8px;
+  animation-delay: 0.2s;
+  animation-duration: 2.5s;
+}
+
+.calculadora-app .bubble:nth-child(2) {
+  left: 35%;
+  width: 5px;
+  height: 5px;
+  animation-delay: 1s;
+  animation-duration: 3.2s;
+}
+
+.calculadora-app .bubble:nth-child(3) {
+  left: 55%;
+  width: 10px;
+  height: 10px;
+  animation-delay: 0.8s;
+  animation-duration: 2.8s;
+}
+
+.calculadora-app .bubble:nth-child(4) {
+  left: 75%;
+  width: 6px;
+  height: 6px;
+  animation-delay: 1.5s;
+  animation-duration: 3.5s;
+}
+
+.calculadora-app .bubble:nth-child(5) {
+  left: 25%;
+  width: 4px;
+  height: 4px;
+  animation-delay: 2s;
+  animation-duration: 2.2s;
+}
+
+.calculadora-app .bubble:nth-child(6) {
+  left: 65%;
+  width: 7px;
+  height: 7px;
+  animation-delay: 0.5s;
+  animation-duration: 3.8s;
+}
+
+/* --- Estilo para el líquido con ondas y burbujas en modo warning --- */
+.calculadora-app .tube-liquid.warning {
+  animation: liquid-wave-warning 2s ease-in-out infinite, pulse-warning 1.5s ease-in-out infinite;
+}
+
+.calculadora-app .tube-liquid.warning .bubble {
+  animation: bubble-rise-warning 2s ease-in infinite;
+}
+
+.calculadora-app .tube-liquid.warning .bubble:nth-child(1) {
+  animation-duration: 1.8s;
+}
+
+.calculadora-app .tube-liquid.warning .bubble:nth-child(2) {
+  animation-duration: 2.2s;
+}
+
+.calculadora-app .tube-liquid.warning .bubble:nth-child(3) {
+  animation-duration: 2s;
+}
+
+.calculadora-app .tube-liquid.warning .bubble:nth-child(4) {
+  animation-duration: 2.5s;
+}
+
+.calculadora-app .tube-liquid.warning .bubble:nth-child(5) {
+  animation-duration: 1.6s;
+}
+
+.calculadora-app .tube-liquid.warning .bubble:nth-child(6) {
+  animation-duration: 2.8s;
+}
+
+
+/* ======================================== */
+/* ANIMACIÓN DE DERRAME DEL LÍQUIDO         */
+/* ======================================== */
+
+/* --- Animación de derrame (líquido saliendo del tubo) --- */
+@keyframes liquid-spill {
+  0% {
+    transform: translateY(0) scaleY(1);
+    opacity: 1;
+  }
+  15% {
+    transform: translateY(-2%) scaleY(1.05);
+    opacity: 1;
+  }
+  30% {
+    transform: translateY(-5%) scaleY(1.15);
+    opacity: 0.95;
+  }
+  50% {
+    transform: translateY(-8%) scaleY(1.25);
+    opacity: 0.9;
+  }
+  70% {
+    transform: translateY(-6%) scaleY(1.2);
+    opacity: 0.92;
+  }
+  85% {
+    transform: translateY(-9%) scaleY(1.28);
+    opacity: 0.88;
+  }
+  100% {
+    transform: translateY(-5%) scaleY(1.2);
+    opacity: 0.92;
+  }
+}
+
+/* --- Gotas que caen del tubo --- */
+@keyframes drop-fall {
+  0% {
+    opacity: 0;
+    transform: translateY(0) scale(0.5);
+  }
+  20% {
+    opacity: 1;
+    transform: translateY(10px) scale(1);
+  }
+  80% {
+    opacity: 1;
+    transform: translateY(40px) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(60px) scale(0.8);
+  }
+}
+
+/* --- Gotas en la pared del tubo --- */
+@keyframes drip-slide {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px) scaleX(0.8);
+  }
+  20% {
+    opacity: 1;
+    transform: translateY(0) scaleX(1);
+  }
+  80% {
+    opacity: 1;
+    transform: translateY(30px) scaleX(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(40px) scaleX(0.9);
+  }
+}
+
+/* --- Efecto de salpicadura --- */
+@keyframes splash {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.3);
+  }
+  30% {
+    opacity: 0.8;
+    transform: translate(10px, -15px) scale(1);
+  }
+  60% {
+    opacity: 0.6;
+    transform: translate(-8px, -25px) scale(0.9);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(5px, -35px) scale(0.5);
+  }
+}
+
+/* --- Partículas de derrame --- */
+@keyframes particle-spray {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.2);
+  }
+  20% {
+    opacity: 0.9;
+    transform: translate(15px, -10px) scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: translate(-10px, -20px) scale(0.8);
+  }
+  80% {
+    opacity: 0.4;
+    transform: translate(8px, -30px) scale(0.6);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(0, -40px) scale(0.3);
+  }
+}
+
+
+/* --- Contenedor del derrame --- */
+.calculadora-app .spill-container {
+  position: absolute;
+  top: -5px;
+  left: -10px;
+  width: calc(100% + 20px);
+  height: calc(100% + 30px);
+  pointer-events: none;
+  z-index: 5;
+  overflow: visible;
+}
+
+/* --- Líquido derramado --- */
+.calculadora-app .spill-liquid {
+  position: absolute;
+  top: -15px;
+  left: -5px;
+  width: calc(100% + 10px);
+  height: 30px;
+  background: linear-gradient(180deg, 
+    rgba(255, 0, 0, 0.6) 0%, 
+    rgba(200, 0, 0, 0.4) 60%,
+    rgba(180, 0, 0, 0.2) 100%
+  );
+  border-radius: 50% 50% 30% 30% / 100% 100% 20% 20%;
+  transform-origin: top center;
+  animation: liquid-spill 2.5s ease-in-out infinite;
+  filter: blur(1px);
+}
+
+/* --- Gotas individuales --- */
+.calculadora-app .drop {
+  position: absolute;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  background: radial-gradient(ellipse at center, 
+    rgba(255, 50, 50, 0.8) 0%, 
+    rgba(200, 0, 0, 0.6) 50%,
+    rgba(150, 0, 0, 0.3) 100%
+  );
+  filter: blur(0.5px);
+  animation: drop-fall 3s ease-in infinite;
+}
+
+.calculadora-app .drop:nth-child(1) {
+  left: 10%;
+  width: 6px;
+  height: 10px;
+  animation-delay: 0.2s;
+  animation-duration: 2.8s;
+}
+
+.calculadora-app .drop:nth-child(2) {
+  left: 30%;
+  width: 4px;
+  height: 8px;
+  animation-delay: 1.2s;
+  animation-duration: 3.2s;
+}
+
+.calculadora-app .drop:nth-child(3) {
+  left: 50%;
+  width: 8px;
+  height: 12px;
+  animation-delay: 0.8s;
+  animation-duration: 2.5s;
+}
+
+.calculadora-app .drop:nth-child(4) {
+  left: 70%;
+  width: 5px;
+  height: 9px;
+  animation-delay: 1.8s;
+  animation-duration: 3.5s;
+}
+
+.calculadora-app .drop:nth-child(5) {
+  left: 90%;
+  width: 7px;
+  height: 11px;
+  animation-delay: 0.5s;
+  animation-duration: 2.9s;
+}
+
+/* --- Gotas en la pared --- */
+.calculadora-app .drip {
+  position: absolute;
+  border-radius: 30% 30% 50% 50% / 40% 40% 60% 60%;
+  background: radial-gradient(ellipse at center, 
+    rgba(255, 50, 50, 0.7) 0%, 
+    rgba(200, 0, 0, 0.5) 100%
+  );
+  filter: blur(0.5px);
+  animation: drip-slide 4s ease-in infinite;
+}
+
+.calculadora-app .drip:nth-child(1) {
+  left: 5%;
+  width: 3px;
+  height: 8px;
+  animation-delay: 0.5s;
+  animation-duration: 3.5s;
+}
+
+.calculadora-app .drip:nth-child(2) {
+  right: 5%;
+  width: 4px;
+  height: 10px;
+  animation-delay: 1.5s;
+  animation-duration: 4s;
+}
+
+/* --- Salpicaduras --- */
+.calculadora-app .splash-particle {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, 
+    rgba(255, 80, 80, 0.8) 0%, 
+    rgba(200, 0, 0, 0.4) 100%
+  );
+  filter: blur(0.5px);
+  animation: splash 2s ease-out infinite;
+}
+
+.calculadora-app .splash-particle:nth-child(1) {
+  left: 20%;
+  top: -5px;
+  width: 6px;
+  height: 6px;
+  animation-delay: 0.3s;
+  animation-duration: 2.2s;
+}
+
+.calculadora-app .splash-particle:nth-child(2) {
+  left: 40%;
+  top: -8px;
+  width: 4px;
+  height: 4px;
+  animation-delay: 1s;
+  animation-duration: 1.8s;
+}
+
+.calculadora-app .splash-particle:nth-child(3) {
+  left: 60%;
+  top: -3px;
+  width: 8px;
+  height: 8px;
+  animation-delay: 0.7s;
+  animation-duration: 2.5s;
+}
+
+.calculadora-app .splash-particle:nth-child(4) {
+  left: 80%;
+  top: -6px;
+  width: 5px;
+  height: 5px;
+  animation-delay: 1.3s;
+  animation-duration: 2s;
+}
+
+/* --- Partículas de derrame (más pequeñas) --- */
+.calculadora-app .spray-particle {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, 
+    rgba(255, 100, 100, 0.6) 0%, 
+    rgba(200, 0, 0, 0.2) 100%
+  );
+  filter: blur(1px);
+  animation: particle-spray 2.5s ease-out infinite;
+}
+
+.calculadora-app .spray-particle:nth-child(1) {
+  left: 15%;
+  width: 3px;
+  height: 3px;
+  animation-delay: 0.4s;
+  animation-duration: 2s;
+}
+
+.calculadora-app .spray-particle:nth-child(2) {
+  left: 45%;
+  width: 2px;
+  height: 2px;
+  animation-delay: 1.1s;
+  animation-duration: 2.3s;
+}
+
+.calculadora-app .spray-particle:nth-child(3) {
+  left: 75%;
+  width: 4px;
+  height: 4px;
+  animation-delay: 0.6s;
+  animation-duration: 1.9s;
+}
+
+.calculadora-app .spray-particle:nth-child(4) {
+  left: 30%;
+  width: 2px;
+  height: 2px;
+  animation-delay: 1.5s;
+  animation-duration: 2.6s;
+}
+
+.calculadora-app .spray-particle:nth-child(5) {
+  left: 65%;
+  width: 3px;
+  height: 3px;
+  animation-delay: 0.9s;
+  animation-duration: 2.1s;
+}
+/* ======================================== */
+/* EFECTO DE DESBORDE DEL LÍQUIDO (WARNING) */
+/* ======================================== */
+
+/* --- Efecto de efervescencia/desborde en la superficie --- */
+@keyframes overflow-boil {
+  0% {
+    transform: scaleY(1) translateY(0);
+    opacity: 0.9;
+  }
+  25% {
+    transform: scaleY(1.08) translateY(-3px);
+    opacity: 1;
+  }
+  50% {
+    transform: scaleY(1.04) translateY(-1px);
+    opacity: 0.95;
+  }
+  75% {
+    transform: scaleY(1.1) translateY(-4px);
+    opacity: 1;
+  }
+  100% {
+    transform: scaleY(1) translateY(0);
+    opacity: 0.9;
+  }
+}
+
+/* --- Olas de desborde en la superficie --- */
+@keyframes overflow-wave {
+  0% {
+    transform: translateX(-10%) scaleX(1.2);
+    opacity: 0.8;
+  }
+  25% {
+    transform: translateX(10%) scaleX(0.9);
+    opacity: 1;
+  }
+  50% {
+    transform: translateX(-5%) scaleX(1.1);
+    opacity: 0.9;
+  }
+  75% {
+    transform: translateX(15%) scaleX(0.95);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-10%) scaleX(1.2);
+    opacity: 0.8;
+  }
+}
+
+/* --- Burbujas de efervescencia en la superficie --- */
+@keyframes fizz-bubble {
+  0% {
+    opacity: 0;
+    transform: translateY(0) scale(0.3);
+  }
+  20% {
+    opacity: 0.9;
+    transform: translateY(-5px) scale(1);
+  }
+  80% {
+    opacity: 0.9;
+    transform: translateY(-15px) scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-25px) scale(0.5);
+  }
+}
+
+/* --- Efecto de burbujeo intenso --- */
+@keyframes intense-boil {
+  0% {
+    transform: scaleY(1) translateY(0);
+  }
+  20% {
+    transform: scaleY(1.05) translateY(-2px);
+  }
+  40% {
+    transform: scaleY(0.98) translateY(1px);
+  }
+  60% {
+    transform: scaleY(1.06) translateY(-3px);
+  }
+  80% {
+    transform: scaleY(0.99) translateY(0px);
+  }
+  100% {
+    transform: scaleY(1) translateY(0);
+  }
+}
+
+/* --- Contenedor del efecto de desborde --- */
+.calculadora-app .overflow-effect {
+  position: absolute;
+  top: -20px;
+  left: -8px;
+  width: calc(100% + 16px);
+  height: 40px;
+  pointer-events: none;
+  z-index: 4;
+  overflow: visible;
+}
+
+/* --- Capa de desborde (líquido que se sale) --- */
+.calculadora-app .overflow-layer {
+  position: absolute;
+  top: -8px;
+  left: -4px;
+  width: calc(100% + 8px);
+  height: 25px;
+  background: linear-gradient(180deg, 
+    rgba(255, 0, 0, 0.7) 0%, 
+    rgba(220, 0, 0, 0.5) 40%,
+    rgba(200, 0, 0, 0.3) 70%,
+    rgba(180, 0, 0, 0.1) 100%
+  );
+  border-radius: 50% 50% 30% 30% / 100% 100% 20% 20%;
+  animation: overflow-boil 1.8s ease-in-out infinite;
+  transform-origin: center bottom;
+  filter: blur(1px);
+}
+
+/* --- Olas de desborde --- */
+.calculadora-app .overflow-wave {
+  position: absolute;
+  top: -5px;
+  left: -2px;
+  width: calc(100% + 4px);
+  height: 15px;
+  background: radial-gradient(ellipse at center, 
+    rgba(255, 50, 50, 0.6) 0%, 
+    rgba(220, 0, 0, 0.3) 50%,
+    transparent 100%
+  );
+  border-radius: 50%;
+  animation: overflow-wave 2.5s ease-in-out infinite;
+  filter: blur(2px);
+}
+
+.calculadora-app .overflow-wave:nth-child(2) {
+  animation-delay: 0.8s;
+  animation-duration: 3s;
+  top: -8px;
+  height: 12px;
+  background: radial-gradient(ellipse at center, 
+    rgba(255, 80, 80, 0.4) 0%, 
+    rgba(200, 0, 0, 0.2) 50%,
+    transparent 100%
+  );
+}
+
+/* --- Burbujas de efervescencia en la superficie --- */
+.calculadora-app .fizz-bubble {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, 
+    rgba(255, 200, 200, 0.6) 0%, 
+    rgba(255, 100, 100, 0.2) 60%,
+    transparent 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  pointer-events: none;
+  animation: fizz-bubble 2s ease-out infinite;
+}
+
+.calculadora-app .fizz-bubble:nth-child(3) {
+  left: 10%;
+  width: 8px;
+  height: 8px;
+  animation-delay: 0.3s;
+  animation-duration: 1.8s;
+}
+
+.calculadora-app .fizz-bubble:nth-child(4) {
+  left: 30%;
+  width: 12px;
+  height: 12px;
+  animation-delay: 0.9s;
+  animation-duration: 2.2s;
+}
+
+.calculadora-app .fizz-bubble:nth-child(5) {
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  animation-delay: 1.5s;
+  animation-duration: 1.6s;
+}
+
+.calculadora-app .fizz-bubble:nth-child(6) {
+  left: 70%;
+  width: 10px;
+  height: 10px;
+  animation-delay: 0.6s;
+  animation-duration: 2s;
+}
+
+.calculadora-app .fizz-bubble:nth-child(7) {
+  left: 90%;
+  width: 7px;
+  height: 7px;
+  animation-delay: 1.2s;
+  animation-duration: 2.4s;
+}
+
+.calculadora-app .fizz-bubble:nth-child(8) {
+  left: 20%;
+  width: 5px;
+  height: 5px;
+  animation-delay: 0.1s;
+  animation-duration: 1.9s;
+}
+
+.calculadora-app .fizz-bubble:nth-child(9) {
+  left: 60%;
+  width: 9px;
+  height: 9px;
+  animation-delay: 0.7s;
+  animation-duration: 2.1s;
+}
+
+/* --- Efecto de burbujeo intenso (todo el líquido) --- */
+.calculadora-app .tube-liquid.warning .boil-effect {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(ellipse at 30% 80%, 
+    rgba(255, 100, 100, 0.15) 0%, 
+    transparent 60%
+  );
+  animation: intense-boil 0.8s ease-in-out infinite;
+  pointer-events: none;
+  border-radius: 0 0 10px 10px;
+}
+
+.calculadora-app .tube-liquid.warning .boil-effect::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 60%;
+  background: radial-gradient(ellipse at 70% 70%, 
+    rgba(255, 50, 50, 0.1) 0%, 
+    transparent 70%
+  );
+  animation: intense-boil 0.6s ease-in-out infinite reverse;
+  border-radius: 0 0 10px 10px;
+}
+
+/* --- Ajustar el menisco en modo warning para que se vea desbordado --- */
+.calculadora-app .tube-liquid.warning .tube-meniscus {
+  background: radial-gradient(ellipse at center, 
+    rgba(255, 50, 50, 0.8) 0%, 
+    rgba(255, 0, 0, 0.4) 40%,
+    transparent 70%
+  ) !important;
+  height: 12px !important;
+  top: -6px !important;
+  filter: blur(2px) !important;
+}
+
+
+
+
+/* === TUBO CON MARCAS A LA DERECHA - VERSIÓN COMPACTA === */
+.tube-v2 {
+  position: relative;
+  width: 85px;
+  height: 180px; /* Reducido de 240px a 180px */
+  margin: 0 auto;
+}
+
+/* Marcas de medición - a la derecha */
+.tube-mark-2000,
+.tube-mark-1500,
+.tube-mark-1000,
+.tube-mark-500,
+.tube-mark-0 {
+  position: absolute;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  z-index: 5;
+  pointer-events: none;
+  gap: 4px;
+}
+
+/* Marcas de medición - casi al punto */
+.tube-mark-2000 { top: -1px; }    /* Antes: 20px */
+.tube-mark-1500 { top: 41px; }    /* Antes: 52px */
+.tube-mark-1000 { top: 81px; }    /* Antes: 84px */
+.tube-mark-500 { top: 120px; }    /* Antes: 116px */
+.tube-mark-0 { top: 159px; }      /* Antes: 148px */
+
+.mark-label {
+  color: #ffffff;
+  font-size: 8px;
+  font-weight: 600;
+  font-family: 'Courier New', monospace;
+  opacity: 0.6;
+  width: 24px;
+  text-align: right;
+  flex-shrink: 0;
+  letter-spacing: 0.5px;
+}
+
+.mark-line {
+  height: 2.5px;
+  background: rgba(255, 255, 255, 0.5);
+  width: 14px;
+  flex-shrink: 0;
+  border-radius: 2px;
+}
+
+.mark-line-full {
+  width: 20px;
+   height: 2.5px;
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 0 6px rgba(255,255,255,0.08);
+}
+
+/* Cuerpo del tubo - más compacto */
+.tube-body {
+  position: absolute;
+  top: 3px;
+  right: 28px;
+  width: 40px;
+  height: 165px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 2.5px solid rgba(255, 255, 255, 0.25);
+  border-radius: 0 0 6px 6px; /* Fondo RECTO, solo ligeramente redondeado */
+  overflow: hidden;
+  z-index: 1;
+  box-shadow: 
+    /* Sombra exterior para dar volumen */
+    0 0 0 1px rgba(255, 255, 255, 0.05),
+    inset 0 0 20px rgba(0,0,0,0.05),
+    0 4px 15px rgba(0,0,0,0.08),
+    inset 0 -10px 30px rgba(0,0,0,0.03);
+}
+
+.tube-body::before {
+content: '';
+  position: absolute;
+  top: 2px;
+  left: 3px;
+  right: 3px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 6;
+}
+
+/* Líquido dentro del tubo - desde el fondo */
+.tube-liquid-v2 {
+  position: absolute !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  transition: height 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  border-radius: 0 0 6px 6px; /* Fondo RECTO como el tubo */
+  will-change: height;
+  min-height: 0px;
+  box-shadow: 
+    inset 0 -8px 20px rgba(0,0,0,0.12),
+    inset 0 8px 20px rgba(255,255,255,0.08);
+
+
+}
+
+/* Menisco */
+.tube-meniscus-v2 {
+  position: absolute;
+  top: -3px;
+  left: -2px;
+  right: -2px;
+  height: 6px;
+  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.05) 60%, transparent 100%);
+  border-radius: 50%;
+  filter: blur(1px);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Burbujas más pequeñas */
+.tube-bubbles-v2 {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.bubble-v2 {
+  position: absolute;
+  background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.03));
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  animation: bubble-rise-v2 5s ease-in-out infinite;
+}
+
+.bubble-v2:nth-child(1) { width: 4px; height: 4px; left: 20%; bottom: 10%; animation-delay: 0s; }
+.bubble-v2:nth-child(2) { width: 3px; height: 3px; left: 55%; bottom: 25%; animation-delay: 1.5s; }
+.bubble-v2:nth-child(3) { width: 5px; height: 5px; left: 35%; bottom: 45%; animation-delay: 3s; }
+.bubble-v2:nth-child(4) { width: 3px; height: 3px; left: 70%; bottom: 15%; animation-delay: 4.5s; }
+
+@keyframes bubble-rise-v2 {
+  0% { transform: translateY(0) scale(0.5); opacity: 0.2; }
+  50% { transform: translateY(-40px) scale(1); opacity: 0.5; }
+  100% { transform: translateY(-80px) scale(0.5); opacity: 0; }
+}
+
+
+
+/* Efectos de desborde (warning) - más compactos */
+.overflow-effect-v2 {
+  position: absolute;
+  top: -5px;
+  left: -2px;
+  right: -2px;
+  height: 12px;
+  pointer-events: none;
+}
+
+.overflow-wave-v2 {
+  position: absolute;
+  top: 0;
+  left: -3px;
+  right: -3px;
+  height: 8px;
+  background: rgba(255, 0, 0, 0.2);
+  border-radius: 50%;
+  animation: wave-splash-v2 0.7s ease-in-out infinite alternate;
+}
+
+.overflow-wave-v2:nth-child(2) {
+  animation-delay: 0.35s;
+  opacity: 0.3;
+}
+
+@keyframes wave-splash-v2 {
+  0% { transform: scaleX(0.8) translateY(1px); opacity: 0.4; }
+  100% { transform: scaleX(1.3) translateY(-4px); opacity: 0; }
+}
+
+.fizz-bubble-v2 {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 50%;
+  animation: fizz-pop-v2 0.4s ease-out infinite;
+}
+
+.fizz-bubble-v2:nth-child(3) { left: 25%; top: 30%; animation-delay: 0.1s; }
+.fizz-bubble-v2:nth-child(4) { left: 55%; top: 20%; animation-delay: 0.2s; }
+.fizz-bubble-v2:nth-child(5) { left: 75%; top: 50%; animation-delay: 0.3s; }
+
+@keyframes fizz-pop-v2 {
+  0% { transform: scale(0); opacity: 0.6; }
+  100% { transform: scale(2); opacity: 0; }
+}
+
+/* Derrame - más compacto */
+.spill-container-v2 {
+  position: absolute;
+  top: -6px;
+  left: -10px;
+  right: -10px;
+  height: 28px;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.spill-liquid-v2 {
+  position: absolute;
+  top: 0;
+  left: -3px;
+  right: -3px;
+  height: 10px;
+  background: rgba(255, 0, 0, 0.15);
+  border-radius: 50%;
+  animation: spill-slosh-v2 0.9s ease-in-out infinite alternate;
+}
+
+@keyframes spill-slosh-v2 {
+  0% { transform: scaleX(1) translateX(0); opacity: 0.5; }
+  100% { transform: scaleX(1.3) translateX(3px); opacity: 0.15; }
+}
+
+.drop-v2 {
+  position: absolute;
+  width: 2px;
+  height: 8px;
+  background: radial-gradient(ellipse at top, rgba(255, 50, 50, 0.4), rgba(200, 0, 0, 0.1));
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  animation: drop-fall-v2 1s ease-in infinite;
+}
+
+.drop-v2:nth-child(3) { left: 2px; top: -3px; animation-delay: 0.15s; }
+.drop-v2:nth-child(4) { right: 2px; top: -3px; animation-delay: 0.5s; }
+.drop-v2:nth-child(5) { left: 50%; top: -3px; animation-delay: 0.85s; }
+
+@keyframes drop-fall-v2 {
+  0% { transform: translateY(0) scale(1); opacity: 0.6; }
+  100% { transform: translateY(20px) scale(0.3); opacity: 0; }
+}
+
+.drip-v2 {
+  position: absolute;
+  width: 1.5px;
+  height: 5px;
+  background: rgba(255, 0, 0, 0.2);
+  border-radius: 0 0 50% 50%;
+  animation: drip-down-v2 1.2s ease-in infinite;
+}
+
+.drip-v2:nth-child(6) { left: -5px; top: 8px; animation-delay: 0.4s; }
+.drip-v2:nth-child(7) { right: -5px; top: 16px; animation-delay: 0.8s; }
+
+@keyframes drip-down-v2 {
+  0% { transform: translateY(0) scaleY(0.3); opacity: 0.3; }
+  100% { transform: translateY(25px) scaleY(1); opacity: 0; }
+}
+
+/* Pulse warning */
+@keyframes pulse-warning {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* Responsive para móvil */
+@media (max-width: 600px) {
+  .tube-v2 {
+    width: 70px;
+    height: 150px;
+  }
+  
+  .tube-body {
+    width: 34px;
+    height: 138px;
+    right: 22px;
+  }
+  
+  .mark-label {
+    font-size: 7px;
+    width: 18px;
+  }
+  
+.mark-line {
+  height: 2px;
+  background: rgba(255, 255, 255, 0.6);
+  width: 14px;
+  flex-shrink: 0;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+.mark-line-full {
+  width: 20px;
+  height: 2.5px;
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 0 6px rgba(255,255,255,0.1);
+}
+  
+.tube-mark-2000 { top: 3px; }
+.tube-mark-1500 { top: 42px; }
+.tube-mark-1000 { top: 81px; }
+.tube-mark-500 { top: 120px; }
+.tube-mark-0 { top: 159px; }
+}
+
+
+/* ===== ESTIMADOR DE REACCIONES ===== */
+
+/* Grid del estimador - UNA SOLA COLUMNA */
+.panel.reactions .reactions-grid {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 3rem !important;
+  margin-bottom: 0.5rem !important;
+  grid-template-columns: none !important;
+}
+
+/* Cada campo ocupa todo el ancho */
+.panel.reactions .grid > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  width: 100%;
+   padding-bottom: 1.5rem; /* 👈 Espacio extra debajo */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06); /* 👈 Línea separadora */
+}
+
+.panel.reactions .reactions-grid > div:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+/* Labels */
+.panel.reactions .grid label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.8);
+  letter-spacing: 0.02em;
+  min-height: 1.4rem;
+  display: flex;
+  align-items: center;
+}
+
+/* Campos de entrada - VERSIÓN ÚNICA Y COMPLETA */
+.panel.reactions .field {
+  display: flex;
+  align-items: stretch;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  transition: border-color 0.2s ease;
+  height: 48px;
+  min-height: 48px;
+  width: 100%;
+}
+
+.panel.reactions .field:focus-within {
+  border-color: rgba(210, 220, 99, 0.4);
+  box-shadow: 0 0 0 2px rgba(210, 220, 99, 0.05);
+}
+
+.panel.reactions .field input {
+  flex: 1;
+  padding: 0 0.8rem;
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  font-size: 0.9rem;
+  min-width: 0;
+  outline: none;
+  height: 100%;
+}
+
+.panel.reactions .field input:focus {
+  outline: none;
+}
+
+.panel.reactions .field select {
+  padding: 0 1.5rem 0 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: none;
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  color: #d2dc63;
+  font-size: 0.8rem;
+  cursor: pointer;
+  min-width: 55px;
+  height: 100%;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23d2dc63'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 10px 6px;
+}
+
+.panel.reactions .field select:hover {
+  background-color: rgba(210, 220, 99, 0.08);
+}
+
+.panel.reactions .field select:focus {
+  outline: none;
+}
+
+.panel.reactions .field select option {
+  background: #1a1a2e;
+  color: #ffffff;
+}
+
+/* Resultado */
+.panel.reactions .result-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 0.5rem 0;
+}
+
+.panel.reactions .result-details {
+  text-align: center;
+  width: 100%;
+}
+
+.panel.reactions .result-label {
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 0.25rem;
+}
+
+.panel.reactions .big {
+  font-size: 3.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.panel.reactions .big small {
+  font-size: 1.2rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.panel.reactions .instruction {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin-top: 0.5rem;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  border-left: 3px solid #d2dc63;
+}
+
+.panel.reactions .instruction strong {
+  color: #d2dc63;
+}
+
+.panel.reactions .formula {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  font-size: 0.9rem;
+  font-family: 'Courier New', monospace;
+  color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 6px;
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+}
+
+/* ===== NOTA IMPORTANTE ===== */
+.reaction-warning-note {
+  margin-top: 1.5rem;
+  padding: 1.25rem 1.5rem;
+  border-radius: 12px;
+  background: rgba(22, 33, 62, 0.9);
+  border: 1px solid rgba(210, 220, 99, 0.2);
+  border-left: 4px solid #d2dc63;
+  color: #e8e8e8;
+  font-size: 0.92rem;
+  line-height: 1.7;
+  box-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.4),
+    0 0 40px rgba(210, 220, 99, 0.02);
+  position: relative;
+  overflow: hidden;
+}
+
+.reaction-warning-note::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(210, 220, 99, 0.02), transparent);
+  pointer-events: none;
+}
+
+.reaction-warning-note strong {
+  color: #d2dc63;
+  font-weight: 600;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .panel.reactions .grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .panel.reactions .big {
+    font-size: 2.8rem;
+  }
+  
+  .panel.reactions .field {
+    height: 40px;
+    min-height: 40px;
+  }
+  
+  .panel.reactions .field select {
+    padding: 0 1.2rem 0 0.8rem;
+    min-width: 60px;
+    font-size: 0.85rem;
+  }
+  
+  .panel.reactions .field input {
+    padding: 0 0.7rem;
+    font-size: 0.9rem;
+  }
+}

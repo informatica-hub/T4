@@ -1,0 +1,36 @@
+# T4 México
+
+> La plataforma 360 de biología molecular más grande de México: síntesis de oligonucleótidos, sondas qPCR, RNA, secuenciación Sanger y servicios especializados.
+
+T4 es una empresa mexicana certificada ISO 9001:2015 dedicada a la síntesis personalizada de ácidos nucleicos y a brindar servicios especializados de biología molecular para investigación, diagnóstico y producción.
+
+## Pages
+
+- [Inicio](/): Plataforma 360 de biología molecular en México.
+- [Nosotros](/nosotros): Quiénes somos, historia y equipo científico de T4.
+- [Calidad](/calidad): Certificaciones ISO 9001:2015 y controles de calidad.
+- [Vinculación](/vinculacion): Colaboración con universidades, centros de investigación e industria.
+- [Preguntas frecuentes](/faq): Resuspensión, almacenamiento, escalas y purificaciones de oligos.
+- [Contacto](/contacto): Datos de contacto y formulario.
+- [Soporte](/soporte): Soporte técnico y asesoría científica.
+- [Certificados](/certificados): Portal público para descarga de certificados de análisis.
+- [Aviso de privacidad](/aviso-privacidad): Política de tratamiento de datos.
+- [Términos y condiciones](/terminos-condiciones): Condiciones de uso del sitio.
+
+## Productos
+
+- [Catálogo de productos](/productos): Catálogo completo de productos T4.
+- [Oligonucleótidos](/productos/oligonucleotidos): Síntesis de primers personalizados, escalas 25 nM–1 µmol.
+- [Sondas qPCR](/productos/sondas-qpcr): Sondas hidrólisis y dual-labeled con FAM, HEX, ROX, Cy5, BHQ.
+- [Síntesis de RNA](/productos/sintesis-rna): RNA sintético para investigación.
+- [ListOligo](/productos/listoligo): Listas y panel de oligonucleótidos preconfigurados.
+- [Modificaciones químicas](/productos/modificaciones-quimicas): Catálogo de modificaciones disponibles.
+- [Mapa espectral](/productos/mapa-espectral): Mapa espectral de fluoróforos y quenchers.
+- [Genes y controles sintéticos](/productos/genes-controles-sinteticos): Genes y controles sintéticos a la medida.
+- [Innovaciones](/productos/innovaciones): Nuevas tecnologías y desarrollos T4.
+
+## Servicios
+
+- [Secuenciación genética](/servicios/secuenciacion-genetica): Secuenciación Sanger y servicios genómicos en México.
+- [Servicios especializados](/servicios/servicios-especializados): Marcadores qPCR, detección de patógenos, OGM, metagenómica.
+- [Soluciones CRO](/servicios/soluciones-cro): Soluciones CRO para industria farmacéutica y biotecnológica.

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DNA Animation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #FAF5F2;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        #container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Loading Screen */
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #FAF5F2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            transition: opacity 0.5s, visibility 0.5s;
+        }
+
+        .loading.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(32, 100, 182, 0.1);
+            border-top-color: #2064B6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Loading Screen -->
+    <div class="loading" id="loading">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Three.js Container -->
+    <div id="container"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="/dna-helix.js"></script>
+
+    <script>
+        let dnaHelix = null;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const container = document.getElementById('container');
+            const loading = document.getElementById('loading');
+
+            dnaHelix = new DNAHelix(container, {
+                postProcessing: { enabled: false }
+            });
+
+            if (dnaHelix.camera) {
+                dnaHelix.dnaGroup.position.x = -2.8;
+                dnaHelix.particles.position.x = -2.8;
+            }
+
+            dnaHelix.setRotationSpeed(0.0050);
+            if (dnaHelix.particles) {
+                dnaHelix.particles.material.opacity = 0.5;
+            }
+
+            setTimeout(() => {
+                loading.classList.add('hidden');
+            }, 800);
+        });
+
+        // Listen for config updates from parent
+        window.addEventListener('message', (event) => {
+            if (!event.data || event.data.type !== 'DNA_CONFIG_UPDATE' || !dnaHelix) return;
+
+            const cfg = event.data.config;
+            const container = document.getElementById('container');
+            const loading = document.getElementById('loading');
+
+            // Dispose and rebuild
+            dnaHelix.dispose();
+            container.innerHTML = '';
+            loading.classList.remove('hidden');
+
+            // Merge config
+            const newConfig = {
+                helix: cfg.helix || DNA_CONFIG.helix,
+                basePairs: cfg.basePairs || DNA_CONFIG.basePairs,
+                backbone: cfg.backbone || DNA_CONFIG.backbone,
+                animation: cfg.animation || DNA_CONFIG.animation,
+                postProcessing: { enabled: false },
+                particles: cfg.particles || DNA_CONFIG.particles,
+            };
+
+            dnaHelix = new DNAHelix(container, newConfig);
+
+            // Apply scene settings
+            if (cfg.scene) {
+                if (cfg.scene.background !== undefined) {
+                    dnaHelix.scene.background = new THREE.Color(cfg.scene.background);
+                    dnaHelix.scene.fog = new THREE.FogExp2(cfg.scene.background, cfg.scene.fogDensity || 0.05);
+                }
+                if (cfg.scene.cameraZ !== undefined) {
+                    dnaHelix.camera.position.set(0, 0, cfg.scene.cameraZ);
+                    dnaHelix.camera.lookAt(0, 0, 0);
+                }
+                if (cfg.scene.positionX !== undefined) {
+                    dnaHelix.dnaGroup.position.x = cfg.scene.positionX;
+                    if (dnaHelix.particles) dnaHelix.particles.position.x = cfg.scene.positionX;
+                }
+            } else {
+                dnaHelix.dnaGroup.position.x = -2.8;
+                if (dnaHelix.particles) dnaHelix.particles.position.x = -2.8;
+            }
+
+            if (dnaHelix.particles) {
+                dnaHelix.particles.material.opacity = 0.5;
+            }
+
+            setTimeout(() => {
+                loading.classList.add('hidden');
+            }, 300);
+        });
+    </script>
+</body>
+
+</html>
