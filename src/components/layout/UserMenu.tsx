@@ -17,6 +17,7 @@ import { LogOut, FolderKanban, History, LogIn, Wallet2, Share2, Key, Wallet  } f
 export function UserMenu() {
   const { user, profile, signOut } = useAuth();
   const { itemCount } = useProject();
+ 
 
   if (!user) {
     return (
@@ -126,6 +127,7 @@ export function UserMenu() {
                Hub
             </Link>
           </DropdownMenuItem>
+
           
           <DropdownMenuSeparator />
           <DropdownMenuItem

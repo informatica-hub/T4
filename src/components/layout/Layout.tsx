@@ -3,6 +3,7 @@ import { Navbar } from "./Navbar";
 import { Footer } from "./Footer";
 import { WhatsAppButton } from "./WhatsAppButton";
 import { PartnersStrip } from "./PartnersStrip";
+import { SupportWidget } from "@/components/support";
 
 export function Layout() {
   return (
@@ -14,6 +15,7 @@ export function Layout() {
       <PartnersStrip />
       <Footer />
       <WhatsAppButton />
+      <SupportWidget />
     </div>
   );
 }

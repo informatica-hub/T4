@@ -16,6 +16,7 @@ import pabloIcon from "@/assets/pablo-ai.png";
 import { UserMenu } from "./UserMenu";
 import { useUserRole } from "@/hooks/useUserRole";
 import { PabloModal } from "@/components/ai/PabloModal";
+import { MessageSquare } from "lucide-react";
 
 const products = [
   { title: "ListOligo", href: "/productos/listoligo", description: "Oligos presintetizados listos para envío" },
@@ -242,6 +243,19 @@ export function Navbar() {
                             </Link>
                           </NavigationMenuLink>
                         </li>
+
+                        <li>
+                          <NavigationMenuLink asChild>
+                            <Link
+                              to="/admin/support"
+                              className="flex items-center gap-2 select-none rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground text-sm"
+                            >
+                              <MessageSquare className="h-4 w-4" />
+                              Soporte en vivo
+                            </Link>
+                          </NavigationMenuLink>
+                        </li>
+
                       </ul>
                     </NavigationMenuContent>
                   </NavigationMenuItem>

@@ -83,10 +83,6 @@ export default function Carrito() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (items.length === 0) {
-      toast.error("Agrega al menos un producto a tu proyecto");
-      return;
-    }
 
     setSubmitting(true);
     try {
@@ -242,7 +238,7 @@ export default function Carrito() {
   }
 
   return (
-    <div className="min-h-screen bg-background pt-24 pb-12 py-[10px]">
+    <div className="min-h-screen bg-background pb-12">
       {/* Hero: Arma tu proyecto */}
       <section className="relative bg-muted/40 pb-8 md:pb-12 pt-20 md:pt-24">
         <NucleotideBackground />
@@ -296,19 +292,7 @@ export default function Carrito() {
 
       {/* Content */}
       <section className="container-width px-4 md:px-8 py-8">
-        {items.length === 0 && !showForm ? (
-          <div className="text-center py-16">
-            <Package className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-            <h2 className="text-xl font-semibold mb-2">Tu proyecto está vacío</h2>
-            <p className="text-muted-foreground mb-6">
-              Explora nuestro catálogo y selecciona los productos que necesitas
-            </p>
-            <Button onClick={() => navigate("/productos")}>
-              Ver Productos
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-          </div>
-        ) : (
+        
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Items list */}
             <div className="lg:col-span-2 space-y-6">
@@ -575,7 +559,7 @@ export default function Carrito() {
                       type="submit"
                       className="w-full"
                       size="lg"
-                      disabled={submitting || items.length === 0}
+                      disabled={submitting}
                     >
                       {submitting ? (
                         <>
@@ -602,7 +586,7 @@ export default function Carrito() {
               </Card>
             </div>
           </div>
-        )}
+        
       </section>
 
       <ProductDetailModal

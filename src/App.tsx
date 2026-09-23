@@ -64,6 +64,7 @@ import ModificacionesQuimicas from "./pages/productos/ModificacionesQuimicas";
 import MapaEspectral from "./pages/productos/MapaEspectral";
 import GenesControlesSinteticos from "./pages/productos/GenesControlesSinteticos";
 import Innovaciones from "./pages/productos/Innovaciones";
+import SupportDashboard from "./pages/admin/SupportDashboard";
 
 function ScrollToTop() {
   const {pathname} = useLocation();
@@ -119,6 +120,7 @@ function App() {
                     <Route path="/admin/dna-config" element={<AdminRoute><DNAConfig /></AdminRoute>} />
                     <Route path="/admin/certificados" element={<AdminRoute><AdminCertificados /></AdminRoute>} />
                     <Route path="/admin/proyectos" element={<AdminRoute><AdminProyectos /></AdminRoute>} />
+                    <Route path="/admin/support" element={<AdminRoute><SupportDashboard /></AdminRoute>} />
                     <Route path="/productos/listoligo" element={<ListOligo />} />
                     <Route path="/productos/oligonucleotidos" element={<Oligonucleotidos />} />
                     <Route path="/productos/sondas-qpcr" element={<SondasQPCR />} />
