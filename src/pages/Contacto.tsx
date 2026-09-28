@@ -272,20 +272,20 @@ const Contacto = () => {
 
       {/* Map */}
       <section className="py-8">
-        <div className="container-width px-4 md:px-8">
-          <div className="rounded-2xl overflow-hidden shadow-lg h-[400px]">
-            <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3721.7562831936!2d-101.35!3d20.68!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjDCsDQwJzQ4LjAiTiAxMDHCsDIxJzAwLjAiVw!5e0!3m2!1ses!2smx!4v1234567890"
-              width="100%"
-              height="100%"
-              style={{ border: 0 }}
-              allowFullScreen
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-              title="Ubicación T4"
-            />
-          </div>
+      <div className="container-width px-4 md:px-8">
+        <div className="rounded-2xl overflow-hidden shadow-lg h-[400px]">
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3732.410769213905!2d-101.36675102492863!3d20.693537880873208!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x842c7fea95729b73%3A0x29c6d94c32646fb3!2sT4!5e0!3m2!1ses!2smx!4v1790625910368!5m2!1ses!2smx"
+            width="100%"
+            height="100%"
+            style={{ border: 0 }}
+            allowFullScreen
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            title="Ubicación T4"
+          />
         </div>
+      </div>
       </section>
     </div>
   );

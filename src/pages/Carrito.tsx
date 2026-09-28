@@ -32,13 +32,20 @@ import { CatalogProduct } from "@/hooks/useCatalogProducts";
 import { downloadCombinedPedidoPdf, type PedidoPdfData } from "@/lib/pedidoPdf";
 import { Seo } from "@/components/seo/Seo";
 import { useAuth } from "@/contexts/AuthContext";
+import { getCampaigns, getFeaturedProducts } from "@/pages/servicios/campaigns";
+import { Campaign, FeaturedProduct } from "@/types/campaign";
+import { CampaignsPanel } from "@/components/carrito/CampaignsPanel";
+import { FeaturedProductsModal } from "@/components/carrito/FeaturedProductsModal";
+
 
 export default function Carrito() {
   const { items, triggerProduct, itemCount, removeItem, clearProject, addItem, hasItem } = useProject();
   const { data: allProducts } = useCatalogProducts();
   const navigate = useNavigate();
   const { user, profile } = useAuth();
-
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  const [featured, setFeatured] = useState<FeaturedProduct[]>([]);
+  const [showFeaturedModal, setShowFeaturedModal] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -53,7 +60,26 @@ export default function Carrito() {
     notes: "",
   });
 
-  // Prefill email from profile/user
+
+useEffect(() => {
+  getCampaigns().then(setCampaigns).catch(() => {});
+  getFeaturedProducts().then(setFeatured).catch(() => {});
+}, []);
+
+const featuredWithProduct: FeaturedProduct[] = featured.map((f) => {
+  const p = allProducts?.find((ap) => ap.id === f.product_id);
+  return {
+    ...f,
+    product: p ? {
+      id: p.id,
+      name: p.name,
+      catalog_number: p.catalog_number ?? null,
+      image_url: p.image_url ?? null,
+      brand: p.brand,
+    } : null,
+  };
+});
+
   useEffect(() => {
     if (user?.email && !form.email) {
       setForm((f) => ({ ...f, email: user.email! }));
@@ -81,8 +107,20 @@ export default function Carrito() {
     return allProducts.filter((p) => relatedIds.has(p.id));
   })();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+ const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+
+  // Si no hay productos destacados, envía directo
+  if (featuredWithProduct.length === 0) {
+    await sendRequest();
+    return;
+  }
+
+  // Si hay, abre el modal primero
+  setShowFeaturedModal(true);
+};
+
+ const sendRequest = async () => {
 
     setSubmitting(true);
     try {
@@ -238,7 +276,7 @@ export default function Carrito() {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-12">
+    <div className="min-h-screen bg-background">
       {/* Hero: Arma tu proyecto */}
       <section className="relative bg-muted/40 pb-8 md:pb-12 pt-20 md:pt-24">
         <NucleotideBackground />
@@ -272,191 +310,18 @@ export default function Carrito() {
       </section>
 
 
-      {/* Header */}
-      <section className="relative bg-muted/30 pb-8 pt-8">
-        <NucleotideBackground />
-        <div className="container-width px-4 md:px-8 relative z-10">
-          <div className="flex items-center gap-3">
-            <FolderKanban className="h-8 w-8 text-primary" />
-            <div>
-              <h1 className="text-2xl md:text-3xl font-bold">Mi Proyecto</h1>
-              <p className="text-muted-foreground">
-                {itemCount === 0
-                  ? "Aún no has seleccionado productos"
-                  : `${itemCount} producto${itemCount > 1 ? "s" : ""} seleccionado${itemCount > 1 ? "s" : ""}`}
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
+     
 
       {/* Content */}
-      <section className="container-width px-4 md:px-8 py-8">
-        
-          <div className="grid lg:grid-cols-3 gap-8">
-            {/* Items list */}
-            <div className="lg:col-span-2 space-y-6">
-              {/* Trigger product header */}
-              {triggerProduct && (
-                <div className="rounded-lg border border-primary/30 bg-primary/5 p-4">
-                  <p className="text-xs font-semibold uppercase tracking-wider text-primary mb-1">
-                    Producto principal
-                  </p>
-                  <p className="font-medium">{triggerProduct.product_name}</p>
-                </div>
-              )}
-
-              {/* Selected products */}
-              <div className="space-y-3">
-                <h3 className="font-semibold text-lg">Productos seleccionados</h3>
-                {items.map((item) => {
-                  const product = allProducts?.find((p) => p.id === item.product_id);
-                  const color = product?.category?.color || "#888888";
-                  return (
-                    <Card
-                      key={item.product_id}
-                      className="overflow-hidden cursor-pointer hover:shadow-md transition-all"
-                      style={{ borderLeftWidth: "4px", borderLeftColor: color }}
-                      onClick={() => product && setSelectedProduct(product)}
-                    >
-                      <CardContent className="p-4">
-                        <div className="flex items-start justify-between gap-4">
-                          <div className="min-w-0 flex-1">
-                            <div className="flex items-center gap-2 mb-1 flex-wrap">
-                              {product?.category && (
-                                <Badge
-                                  className="text-[10px] text-white px-1.5 py-0"
-                                  style={{ backgroundColor: color }}
-                                >
-                                  {product.category.name}
-                                </Badge>
-                              )}
-                              <Badge variant="outline" className="text-[10px]">
-                                {product?.brand === "t4" ? "T4" : "Partner"}
-                              </Badge>
-                            </div>
-                            <p className="font-medium">{item.product_name}</p>
-                            {product?.catalog_number && (
-                              <p className="text-xs text-muted-foreground font-mono">
-                                Cat. {product.catalog_number}
-                              </p>
-                            )}
-                            {product?.description && (
-                              <p className="text-xs text-muted-foreground line-clamp-2 mt-1">
-                                {product.description}
-                              </p>
-                            )}
-                            <div className="flex items-center gap-4 mt-2 flex-wrap">
-                              {product?.delivery_time && (
-                                <span className="text-xs text-muted-foreground flex items-center gap-1">
-                                  <Clock className="h-3 w-3" />
-                                  {product.delivery_time}
-                                </span>
-                              )}
-                              {product?.applications && product.applications.length > 0 && (
-                                <div className="flex gap-1">
-                                  {product.applications.slice(0, 2).map((app) => (
-                                    <Badge key={app} variant="secondary" className="text-[10px]">
-                                      {app}
-                                    </Badge>
-                                  ))}
-                                  {product.applications.length > 2 && (
-                                    <Badge variant="secondary" className="text-[10px]">
-                                      +{product.applications.length - 2}
-                                    </Badge>
-                                  )}
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="text-destructive hover:text-destructive flex-shrink-0"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              removeItem(item.product_id);
-                            }}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
-              </div>
-
-              {/* Related products */}
-              {relatedProducts.length > 0 && (
-                <div className="space-y-3">
-                  <h3 className="font-semibold text-lg">Productos relacionados</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Selecciona los productos que necesitas para complementar tu proyecto
-                  </p>
-                  <div className="grid sm:grid-cols-2 gap-3">
-                    {relatedProducts.map((product) => {
-                      const added = hasItem(product.id);
-                      return (
-                        <Card
-                          key={product.id}
-                          className={`cursor-pointer transition-all ${added ? "border-primary bg-primary/5" : "hover:border-primary/30"}`}
-                          onClick={() => {
-                            if (!added) {
-                              addItem({ product_id: product.id, product_name: product.name });
-                              toast.success(`${product.name} agregado`);
-                            }
-                          }}
-                        >
-                          <CardContent className="p-4">
-                            <div className="flex items-start justify-between gap-2">
-                              <div className="min-w-0">
-                                <p className="font-medium text-sm truncate">{product.name}</p>
-                                {product.description && (
-                                  <p className="text-xs text-muted-foreground line-clamp-2 mt-1">
-                                    {product.description}
-                                  </p>
-                                )}
-                                {product.category && (
-                                  <Badge
-                                    variant="outline"
-                                    className="mt-2 text-[10px]"
-                                    style={{ borderColor: product.category.color, color: product.category.color }}
-                                  >
-                                    {product.category.name}
-                                  </Badge>
-                                )}
-                              </div>
-                              {added ? (
-                                <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0" />
-                              ) : (
-                                <Plus className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                              )}
-                            </div>
-                          </CardContent>
-                        </Card>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-
-              {/* Clear project */}
-              {items.length > 0 && (
-                <Button
-                  variant="outline"
-                  className="text-destructive hover:text-destructive"
-                  onClick={clearProject}
-                >
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  Limpiar proyecto
-                </Button>
-              )}
-            </div>
-
+      <section className="max-w-8xl mx-auto px-2 md:px-4 py-8 relative bg-muted/40">
+      <NucleotideBackground />
             {/* Sidebar: Request form */}
-            <div className="lg:col-span-1">
-              <Card className="sticky top-24">
+            <div className="relative z-10 grid lg:grid-cols-12 gap-6">
+              <div className="lg:col-span-7">
+      <CampaignsPanel campaigns={campaigns} />
+    </div>
+              <div className="lg:col-span-4">
+      <Card className="sticky top-24">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Send className="h-5 w-5" />
@@ -468,92 +333,150 @@ export default function Carrito() {
                 </CardHeader>
                 <form onSubmit={handleSubmit}>
                   <CardContent className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="institution">Institución *</Label>
-                      <Input
-                        id="institution"
-                        required
-                        value={form.institution}
-                        onChange={(e) => setForm((f) => ({ ...f, institution: e.target.value }))}
-                        placeholder="Universidad, centro de investigación..."
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="laboratory">Laboratorio *</Label>
-                      <Input
-                        id="laboratory"
-                        required
-                        value={form.laboratory}
-                        onChange={(e) => setForm((f) => ({ ...f, laboratory: e.target.value }))}
-                        placeholder="Nombre del laboratorio"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="email">Correo electrónico *</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        required
-                        value={form.email}
-                        onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
-                        placeholder="tu@institucion.edu.mx"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="notes">Notas adicionales</Label>
-                      <Textarea
-                        id="notes"
-                        value={form.notes}
-                        onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))}
-                        placeholder="Productos que no encuentras, especificaciones, cantidades..."
-                        rows={3}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="excel">Adjuntar formato en Excel (opcional)</Label>
-                      {excelFile ? (
-                        <div className="flex items-center justify-between gap-2 rounded-md border border-input bg-muted/40 px-3 py-2 text-sm">
-                          <span className="flex items-center gap-2 min-w-0">
-                            <Paperclip className="h-4 w-4 text-primary flex-shrink-0" />
-                            <span className="truncate">{excelFile.name}</span>
-                          </span>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            className="h-7 w-7 p-0 flex-shrink-0"
-                            onClick={() => setExcelFile(null)}
-                          >
-                            <X className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      ) : (
-                        <Input
-                          id="excel"
-                          type="file"
-                          accept=".xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"
-                          onChange={(e) => {
-                            const f = e.target.files?.[0];
-                            if (!f) return;
-                            if (!/\.(xlsx|xls)$/i.test(f.name)) {
-                              toast.error("Solo se permiten archivos .xlsx o .xls");
-                              e.target.value = "";
-                              return;
-                            }
-                            if (f.size > 10 * 1024 * 1024) {
-                              toast.error("El archivo supera los 10 MB");
-                              e.target.value = "";
-                              return;
-                            }
-                            setExcelFile(f);
-                          }}
-                        />
-                      )}
-                      <p className="text-xs text-muted-foreground">
-                        Puedes adjuntar el formato de solicitud que descargaste arriba (máx 10 MB).
-                      </p>
-                    </div>
-                  </CardContent>
+
+  {/* Resto del formulario */}
+  <div className="space-y-2">
+    <Label htmlFor="institution">Institución *</Label>
+    <Input
+      id="institution"
+      required
+      value={form.institution}
+      onChange={(e) => setForm((f) => ({ ...f, institution: e.target.value }))}
+      placeholder="Universidad, centro de investigación..."
+    />
+  </div>
+
+  <div className="space-y-2">
+    <Label htmlFor="laboratory">Laboratorio *</Label>
+    <Input
+      id="laboratory"
+      required
+      value={form.laboratory}
+      onChange={(e) => setForm((f) => ({ ...f, laboratory: e.target.value }))}
+      placeholder="Nombre del laboratorio"
+    />
+  </div>
+
+  <div className="space-y-2">
+    <Label htmlFor="email">Correo electrónico *</Label>
+    <Input
+      id="email"
+      type="email"
+      required
+      value={form.email}
+      onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+      placeholder="tu@institucion.edu.mx"
+    />
+  </div>
+
+  <div className="space-y-2">
+    <Label htmlFor="notes">Notas adicionales</Label>
+    <Textarea
+      id="notes"
+      value={form.notes}
+      onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))}
+      placeholder="Productos que no encuentras, especificaciones, cantidades..."
+      rows={3}
+    />
+  </div>
+
+  <div className="space-y-2">
+    <Label htmlFor="excel">Adjuntar formato en Excel (opcional)</Label>
+    {excelFile ? (
+      <div className="flex items-center justify-between gap-2 rounded-md border border-input bg-muted/40 px-3 py-2 text-sm">
+        <span className="flex items-center gap-2 min-w-0">
+          <Paperclip className="h-4 w-4 text-primary flex-shrink-0" />
+          <span className="truncate">{excelFile.name}</span>
+        </span>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="h-7 w-7 p-0 flex-shrink-0"
+          onClick={() => setExcelFile(null)}
+        >
+          <X className="h-4 w-4" />
+        </Button>
+      </div>
+    ) : (
+      <Input
+        id="excel"
+        type="file"
+        accept=".xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"
+        onChange={(e) => {
+          const f = e.target.files?.[0];
+          if (!f) return;
+          if (!/\.(xlsx|xls)$/i.test(f.name)) {
+            toast.error("Solo se permiten archivos .xlsx o .xls");
+            e.target.value = "";
+            return;
+          }
+          if (f.size > 10 * 1024 * 1024) {
+            toast.error("El archivo supera los 10 MB");
+            e.target.value = "";
+            return;
+          }
+          setExcelFile(f);
+        }}
+      />
+    )}
+    <p className="text-xs text-muted-foreground">
+      Puedes adjuntar el formato de solicitud que descargaste arriba (máx 10 MB).
+    </p>
+  </div>
+  
+  <Separator />
+
+    {/* Productos agregados */}
+  <div className="space-y-2">
+    <div className="flex items-center justify-between">
+      <Label className="text-xs uppercase tracking-wide text-muted-foreground">
+        Productos en tu proyecto
+      </Label>
+      <Badge variant="secondary" className="text-xs">
+        {items.length} {items.length === 1 ? "producto" : "productos"}
+      </Badge>
+    </div>
+
+    {items.length === 0 ? (
+      <div className="rounded-md border border-dashed p-3 text-center text-xs text-muted-foreground">
+        Aún no has agregado productos.
+      </div>
+    ) : (
+      <div className="rounded-md border divide-y max-h-56 overflow-y-auto">
+        {items.map((item) => {
+          const p = allProducts?.find((ap) => ap.id === item.product_id);
+          return (
+            <div
+              key={item.product_id}
+              className="flex items-center gap-2 px-3 py-2 text-sm"
+            >
+              <Package className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+              <div className="flex-1 min-w-0">
+                <p className="truncate font-medium">{item.product_name}</p>
+                {p?.catalog_number && (
+                  <p className="text-xs text-muted-foreground truncate">
+                    Cat. {p.catalog_number}
+                  </p>
+                )}
+              </div>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-7 w-7 p-0 flex-shrink-0 text-muted-foreground hover:text-destructive"
+                onClick={() => removeItem(item.product_id)}
+                aria-label={`Quitar ${item.product_name}`}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          );
+        })}
+      </div>
+    )}
+  </div>
+</CardContent>
                   <CardFooter className="flex flex-col gap-3">
                     <Button
                       type="submit"
@@ -588,6 +511,14 @@ export default function Carrito() {
           </div>
         
       </section>
+
+      <FeaturedProductsModal
+  open={showFeaturedModal}
+  onOpenChange={setShowFeaturedModal}
+  featured={featuredWithProduct}
+  submitting={submitting}
+  onSendAnyway={sendRequest}
+/>
 
       <ProductDetailModal
         producto={selectedProduct}

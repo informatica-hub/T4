@@ -73,28 +73,31 @@ export function useChatMessages(conversationId: string | null) {
   }, [conversationId]);
 
   const sendMessage = async (
-    content: string,
-    senderId: string,
-    senderRole: "customer" | "agent"
-  ) => {
-    if (!conversationId || !content.trim()) return { error: "Mensaje vacío" };
+  content: string,
+  senderId: string,
+  senderRole: "customer" | "agent"
+): Promise<{ error: string | null; messageId: string | null }> => {
+  if (!conversationId || !content.trim()) {
+    return { error: "Mensaje vacío", messageId: null };
+  }
 
-    const { error: insertError } = await supabase
-      .from("messages")
-      .insert({
-        conversation_id: conversationId,
-        sender_id: senderId,
-        sender_role: senderRole,
-        content: content.trim(),
-      });
+  const { data, error: insertError } = await supabase
+    .from("messages")
+    .insert({
+      conversation_id: conversationId,
+      sender_id: senderId,
+      sender_role: senderRole,
+      content: content.trim(),
+    })
+    .select("id")
+    .single();
 
-    if (insertError) {
-      console.error("Error enviando mensaje:", insertError);
-      return { error: insertError.message };
-    }
+  if (insertError || !data) {
+    console.error("Error enviando mensaje:", insertError);
+    return { error: insertError?.message ?? "Error desconocido", messageId: null };
+  }
 
-    return { error: null };
-  };
-
+  return { error: null, messageId: data.id };
+};
   return { messages, loading, error, sendMessage };
 }

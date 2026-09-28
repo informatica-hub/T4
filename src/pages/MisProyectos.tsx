@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -19,7 +19,14 @@ import { NucleotideBackground } from "@/components/ui/NucleotideBackground";
 import { Seo } from "@/components/seo/Seo";
 import { downloadCombinedPedidoPdf, type PedidoPdfData } from "@/lib/pedidoPdf";
 import { toast } from "sonner";
-
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface ProjectRequest {
   id: string;
@@ -61,6 +68,7 @@ const ALLOWED_PAYMENT_EXT = [".pdf", ".png", ".jpg", ".jpeg" ];
 
 export default function MisProyectos() {
   const { user, profile } = useAuth();
+  const navigate = useNavigate();
   const [requests, setRequests] = useState<ProjectRequest[]>([]);
   const [attachments, setAttachments] = useState<Record<string, Attachment[]>>({});
   const [loading, setLoading] = useState(true);
@@ -68,6 +76,7 @@ export default function MisProyectos() {
   const [uploadingId, setUploadingId] = useState<string | null>(null);
   const fileInputs = useRef<Record<string, HTMLInputElement | null>>({});
   const [uploadingPaymentId, setUploadingPaymentId] = useState<string | null>(null);
+  const [pendingUpload, setPendingUpload] = useState<{ req: ProjectRequest; file: File } | null>(null);
   const paymentFileInputs = useRef<Record<string, HTMLInputElement | null>>({});
 
   useEffect(() => {
@@ -125,108 +134,123 @@ export default function MisProyectos() {
   };
 
 
-  const handleUpload = async (req: ProjectRequest, file: File) => {
-    if (!user) return;
-    const ext = "." + (file.name.split(".").pop() || "").toLowerCase();
-    if (!ALLOWED_EXT.includes(ext)) {
-      toast.error("Solo se permiten archivos Excel (.xlsx, .xls)");
-      return;
-    }
-    if (file.size > MAX_SIZE) {
-      toast.error("El archivo excede 10 MB");
-      return;
-    }
-    const existing = (attachments[req.id] || []).filter((a) => a.kind !== "admin_quote");
+  const handleUpload = (req: ProjectRequest, file: File) => {
+  const ext = "." + (file.name.split(".").pop() || "").toLowerCase();
+  if (!ALLOWED_EXT.includes(ext)) {
+    toast.error("Solo se permiten archivos Excel (.xlsx, .xls)");
+    return;
+  }
+  if (file.size > MAX_SIZE) {
+    toast.error("El archivo excede 10 MB");
+    return;
+  }
+
+  const existing = (attachments[req.id] || []).filter((a) => a.kind === "user_excel");
+
+  // Si NO hay Excel previo, sube directo sin modal
+  if (existing.length === 0) {
+    void performUpload(req, file);
+    return;
+  }
+
+  // Si SÍ hay Excel previo, abre el modal
+  setPendingUpload({ req, file });
+};
+
+// Lógica real de subida (antes estaba dentro de handleUpload)
+const performUpload = async (req: ProjectRequest, file: File) => {
+  if (!user) return;
+  setUploadingId(req.id);
+  try {
+    const existing = (attachments[req.id] || []).filter(
+      (a) => a.kind !== "admin_quote" && a.kind !== "payment_proof"
+    );
+
+    // Reemplazar: borrar el anterior
     if (existing.length > 0) {
-      if (!confirm("Ya hay un Excel adjunto. ¿Reemplazarlo?")) return;
-    }
-    setUploadingId(req.id);
-    try {
-      // Replace: remove existing first
-      if (existing.length > 0) {
-        await supabase.storage
-          .from("project-attachments")
-          .remove(existing.map((a) => a.file_path));
-        await (supabase as any)
-          .from("project_attachments")
-          .delete()
-          .in("id", existing.map((a) => a.id));
-      }
-      const safeName = file.name.replace(/[^a-zA-Z0-9._-]+/g, "_");
-      const path = `${user.id}/${req.id}/${Date.now()}_${safeName}`;
-      const { error: upErr } = await supabase.storage
+      await supabase.storage
         .from("project-attachments")
-        .upload(path, file, { contentType: file.type, upsert: false });
-      if (upErr) throw upErr;
-      
-      const { data: row, error: insErr } = await (supabase as any)
+        .remove(existing.map((a) => a.file_path));
+      await (supabase as any)
         .from("project_attachments")
-        .insert({
+        .delete()
+        .in("id", existing.map((a) => a.id));
+    }
+
+    const safeName = file.name.replace(/[^a-zA-Z0-9._-]+/g, "_");
+    const path = `${user.id}/${req.id}/${Date.now()}_${safeName}`;
+    const { error: upErr } = await supabase.storage
+      .from("project-attachments")
+      .upload(path, file, { contentType: file.type, upsert: false });
+    if (upErr) throw upErr;
+
+    const { data: row, error: insErr } = await (supabase as any)
+      .from("project_attachments")
+      .insert({
+        project_request_id: req.id,
+        user_id: user.id,
+        file_path: path,
+        file_name: file.name,
+        mime_type: file.type || null,
+        size_bytes: file.size,
+        kind: "user_excel",
+      })
+      .select()
+      .single();
+    if (insErr) throw insErr;
+
+    // Notificar al admin si había un Excel previo
+    if (existing.length > 0) {
+      const { error: fnErr } = await supabase.functions.invoke("notify-file-updated", {
+        body: {
+          type: "archivo_reemplazado",
           project_request_id: req.id,
           user_id: user.id,
-          file_path: path,
-          file_name: file.name,
-          mime_type: file.type || null,
-          size_bytes: file.size,
-          kind: "user_excel",
-        })
-        .select()
-        .single();
-      if (insErr) throw insErr;
-
-      //edge function actualizar solicitud
-       if (existing.length > 0) {
-        const { error: fnErr } = await supabase.functions.invoke("notify-file-updated", {
-          body: {
-            type: "archivo_reemplazado",
-            project_request_id: req.id,
-            user_id: user.id,
-            previous_attachment_ids: existing.map((a) => a.id),
-            previous_file_paths: existing.map((a) => a.file_path),
-            new_attachment: {
-              id: row.id,
-              file_path: row.file_path,
-              file_name: row.file_name,
-              mime_type: row.mime_type,
-              size_bytes: row.size_bytes,
-            },
-            project_name: (req as any).name ?? null,
-            user_email: user.email ?? null,
-            user_name: (user.user_metadata?.full_name as string) ?? null,
-            client: {
-              name: (req as any).client_name ?? (req as any).contact_name ?? null,
-              institution: (req as any).institution ?? null,
-              laboratory: (req as any).laboratory ?? null,
-              email: (req as any).email ?? (req as any).contact_email ?? null,
-            },
+          previous_attachment_ids: existing.map((a) => a.id),
+          previous_file_paths: existing.map((a) => a.file_path),
+          new_attachment: {
+            id: row.id,
+            file_path: row.file_path,
+            file_name: row.file_name,
+            mime_type: row.mime_type,
+            size_bytes: row.size_bytes,
           },
-        });
-
-        if (fnErr) {
-          console.error("Error invocando notify-file-updated:", fnErr);
-        } else if (req.status === "cotizado") {
-          setRequests((prev) =>
-            prev.map((r) =>
-              r.id === req.id
-                ? { ...r, status: "pending", has_update: true }
-                : r
-            )
-          );
-        }
-      }
-
-      setAttachments((prev) => {
-        const others = (prev[req.id] || []).filter((a) => a.kind === "admin_quote");
-        return { ...prev, [req.id]: [row as Attachment, ...others] };
+          project_name: (req as any).name ?? null,
+          user_email: user.email ?? null,
+          user_name: (user.user_metadata?.full_name as string) ?? null,
+          client: {
+            name: (req as any).client_name ?? (req as any).contact_name ?? null,
+            institution: (req as any).institution ?? null,
+            laboratory: (req as any).laboratory ?? null,
+            email: (req as any).email ?? (req as any).contact_email ?? null,
+          },
+        },
       });
-      toast.success(existing.length > 0 ? "Excel reemplazado" : "Excel adjuntado al proyecto");
-    } catch (e: any) {
-      console.error(e);
-      toast.error(e?.message || "No se pudo subir el archivo");
-    } finally {
-      setUploadingId(null);
+      if (fnErr) {
+        console.error("Error invocando notify-file-updated:", fnErr);
+      } else if (req.status === "cotizado") {
+        setRequests((prev) =>
+          prev.map((r) =>
+            r.id === req.id ? { ...r, status: "pending", has_update: true } : r
+          )
+        );
+      }
     }
-  };
+
+    setAttachments((prev) => {
+      const others = (prev[req.id] || []).filter(
+        (a) => a.kind === "admin_quote" || a.kind === "payment_proof"
+      );
+      return { ...prev, [req.id]: [row as Attachment, ...others] };
+    });
+    toast.success(existing.length > 0 ? "Excel reemplazado" : "Excel adjuntado al proyecto");
+  } catch (e: any) {
+    console.error(e);
+    toast.error(e?.message || "No se pudo subir el archivo");
+  } finally {
+    setUploadingId(null);
+  }
+};
 
 
 
@@ -358,10 +382,13 @@ export default function MisProyectos() {
   };
 
   return (
-    <div className="min-h-screen bg-background pt-24 pb-12 py-[10px]">
+    <div className="min-h-screen bg-muted/30  pb-12 ">
+      <NucleotideBackground />
+      
       <Seo title="Mis Proyectos | T4" description="Historial de tus proyectos y cotizaciones T4." noindex />
-      <section className="relative bg-muted/30 pb-8">
-        <NucleotideBackground />
+      
+      <section className="relative py-20 pb-8">
+        
         <div className="container-width px-4 md:px-8 relative z-10">
           <div className="flex items-center gap-3">
             <FolderKanban className="h-8 w-8 text-primary" />
@@ -376,7 +403,7 @@ export default function MisProyectos() {
         </div>
       </section>
 
-      <section className="container-width px-4 md:px-8 py-8">
+      <section className="container-width  px-4 md:px-8 py-8">
         {loading ? (
           <div className="flex justify-center py-16">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -409,9 +436,10 @@ export default function MisProyectos() {
              const paymentAtts = projAtts.filter((a) => a.kind === "payment_proof");
              const quoteAtts = projAtts.filter((a) => a.kind === "admin_quote");
              console.log(`🔍 Proyecto ${req.id} - quoteAtts:`, quoteAtts);
+             
               return (
-                <Card key={req.id}>
-                  <CardHeader className="pb-3">
+                <Card key={req.id} className="bg-background bg-opacity-100 relative z-10" >
+                  <CardHeader className="pb-3 ">
                     <div className="flex items-start justify-between gap-3 flex-wrap">
                       <div>
                         <CardTitle className="text-base">
@@ -498,15 +526,15 @@ export default function MisProyectos() {
 
 
                     {req.status !== 'pending' && req.status !== 'nuevo' && (
-  <div className="mt-3 space-y-1.5 border-t pt-3">
-    <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1">
+      <div className="mt-3 space-y-1.5 border-t pt-3">
+      <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1">
       Cotización y documentos del equipo T4
-    </p>
-    {quoteAtts.length === 0 ? (
+      </p>
+      {quoteAtts.length === 0 ? (
       <p className="text-xs text-muted-foreground italic">
         Aún no se ha subido la cotización. Te avisaremos cuando esté lista.
       </p>
-    ) : (
+      ) : (
       quoteAtts.map((a) => (
         <div key={a.id} className="flex items-center gap-2 text-sm">
           <FileText className="h-4 w-4 text-primary shrink-0" />
@@ -530,8 +558,8 @@ export default function MisProyectos() {
           </Button>
         </div>
       ))
-    )}
-  </div>
+      )}
+     </div>
 )}
 
 {paymentAtts.length > 0 && (
@@ -637,6 +665,64 @@ export default function MisProyectos() {
           </div>
         )}
       </section>
+      <Dialog
+  open={!!pendingUpload}
+  onOpenChange={(open) => !open && setPendingUpload(null)}
+>
+  <DialogContent className="max-w-md w-[calc(100%-2rem)]">
+    <DialogHeader>
+      <DialogTitle>¿Reemplazar el formato de solicitud?</DialogTitle>
+      <DialogDescription className="space-y-2 pt-2">
+        <span className="block">
+          Este proyecto ya tiene un Excel cargado. Al subir el nuevo archivo, 
+          <strong> el anterior se eliminará</strong>.
+        </span>
+        <span className="block">
+         Si el archivo pertenece a otro proyecto, <strong>crea uno nuevo </strong> 
+         para no perder el actual.
+        </span>
+      </DialogDescription>
+    </DialogHeader>
+
+    <DialogFooter className="flex flex-col-reverse gap-2 sm:flex-col sm:gap-2">
+      <Button
+    className="w-full"
+    onClick={() => {
+      if (pendingUpload) {
+        const { req, file } = pendingUpload;
+        setPendingUpload(null);
+        void performUpload(req, file);
+      }
+    }}
+  >
+    <Upload className="h-4 w-4 mr-2" />
+    Sí, reemplazar
+  </Button>
+  
+  <Button
+    variant="secondary"
+    className="w-full"
+    onClick={() => {
+      setPendingUpload(null);
+      navigate("/carrito");
+    }}
+  >
+    <Plus className="h-4 w-4 mr-2" />
+    Crear nuevo proyecto
+  </Button>
+
+  <Button
+    variant="outline"
+    className="w-full"
+    onClick={() => setPendingUpload(null)}
+  >
+    Cancelar
+  </Button>
+  
+</DialogFooter>
+
+  </DialogContent>
+</Dialog>
     </div>
   );
 }

@@ -32,7 +32,7 @@ export function DNAHeroSection() {
               style={{ color: "#799458", animationDelay: "0.1s" }}
             >
               Soluciones en <span className="text-primary">biología molecular</span> desarrolladas por{" "}
-              <span className="text-primary">científicos, para cientificos.</span>
+              <span className="text-primary">científicos, para científicos.</span>
             </h1>
             <p
               className="text-lg md:text-xl font-medium animate-fade-in mb-6 text-primary/90"

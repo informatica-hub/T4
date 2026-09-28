@@ -38,6 +38,42 @@ export type Database = {
         }
         Relationships: []
       }
+      campaigns: {
+        Row: {
+          active: boolean
+          created_at: string
+          cta_link: string | null
+          cta_text: string | null
+          description: string | null
+          id: string
+          image_url: string
+          sort_order: number
+          title: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          cta_link?: string | null
+          cta_text?: string | null
+          description?: string | null
+          id?: string
+          image_url: string
+          sort_order?: number
+          title: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          cta_link?: string | null
+          cta_text?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string
+          sort_order?: number
+          title?: string
+        }
+        Relationships: []
+      }
       cart_items: {
         Row: {
           created_at: string
@@ -228,6 +264,147 @@ export type Database = {
             columns: ["order_id"]
             isOneToOne: false
             referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      conversations: {
+        Row: {
+          assigned_agent_id: string | null
+          created_at: string
+          customer_id: string
+          id: string
+          last_message_at: string
+          status: string
+        }
+        Insert: {
+          assigned_agent_id?: string | null
+          created_at?: string
+          customer_id: string
+          id?: string
+          last_message_at?: string
+          status?: string
+        }
+        Update: {
+          assigned_agent_id?: string | null
+          created_at?: string
+          customer_id?: string
+          id?: string
+          last_message_at?: string
+          status?: string
+        }
+        Relationships: []
+      }
+      featured_products: {
+        Row: {
+          active: boolean
+          badge: string | null
+          created_at: string
+          custom_description: string | null
+          custom_title: string | null
+          id: string
+          product_id: string
+          sort_order: number
+        }
+        Insert: {
+          active?: boolean
+          badge?: string | null
+          created_at?: string
+          custom_description?: string | null
+          custom_title?: string | null
+          id?: string
+          product_id: string
+          sort_order?: number
+        }
+        Update: {
+          active?: boolean
+          badge?: string | null
+          created_at?: string
+          custom_description?: string | null
+          custom_title?: string | null
+          id?: string
+          product_id?: string
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "featured_products_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "catalog_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      message_attachments: {
+        Row: {
+          created_at: string
+          file_name: string
+          file_path: string
+          id: string
+          message_id: string
+          mime_type: string
+          size_bytes: number
+        }
+        Insert: {
+          created_at?: string
+          file_name: string
+          file_path: string
+          id?: string
+          message_id: string
+          mime_type: string
+          size_bytes: number
+        }
+        Update: {
+          created_at?: string
+          file_name?: string
+          file_path?: string
+          id?: string
+          message_id?: string
+          mime_type?: string
+          size_bytes?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "message_attachments_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      messages: {
+        Row: {
+          content: string
+          conversation_id: string
+          created_at: string
+          id: string
+          sender_id: string
+          sender_role: string
+        }
+        Insert: {
+          content: string
+          conversation_id: string
+          created_at?: string
+          id?: string
+          sender_id: string
+          sender_role: string
+        }
+        Update: {
+          content?: string
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          sender_id?: string
+          sender_role?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
             referencedColumns: ["id"]
           },
         ]
@@ -478,6 +655,7 @@ export type Database = {
         Row: {
           created_at: string
           email: string
+          has_update: boolean | null
           id: string
           institution: string
           laboratory: string
@@ -492,6 +670,7 @@ export type Database = {
         Insert: {
           created_at?: string
           email: string
+          has_update?: boolean | null
           id?: string
           institution: string
           laboratory: string
@@ -506,6 +685,7 @@ export type Database = {
         Update: {
           created_at?: string
           email?: string
+          has_update?: boolean | null
           id?: string
           institution?: string
           laboratory?: string

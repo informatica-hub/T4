@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, Settings } from "lucide-react";
+import { Menu, X, Settings, MessageSquare, Package, FileCheck, FolderKanban, Dna, Wallet2, Megaphone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   NavigationMenu,
@@ -16,7 +16,7 @@ import pabloIcon from "@/assets/pablo-ai.png";
 import { UserMenu } from "./UserMenu";
 import { useUserRole } from "@/hooks/useUserRole";
 import { PabloModal } from "@/components/ai/PabloModal";
-import { MessageSquare } from "lucide-react";
+import { useOpenConversationsCount } from "@/hooks/useOpenConversationsCount";
 
 const products = [
   { title: "ListOligo", href: "/productos/listoligo", description: "Oligos presintetizados listos para envío" },
@@ -45,6 +45,8 @@ export function Navbar() {
   const { isAdmin } = useUserRole();
 
   const isActive = (path: string) => location.pathname === path;
+
+  const openConversationsCount = useOpenConversationsCount();
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border/50">
@@ -197,8 +199,9 @@ export function Navbar() {
                           <NavigationMenuLink asChild>
                             <Link
                               to="/admin/catalogo"
-                              className="block select-none rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground text-sm"
+                              className="flex items-center gap-2 select-none rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground text-sm"
                             >
+                              <Package className="h-4 w-4 shrink-0" />
                               Catálogo
                             </Link>
                           </NavigationMenuLink>
@@ -207,8 +210,9 @@ export function Navbar() {
                           <NavigationMenuLink asChild>
                             <Link
                               to="/admin/certificados"
-                              className="block select-none rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground text-sm"
+                              className="flex items-center gap-2 select-none rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground text-sm"
                             >
+                              <FileCheck className="h-4 w-4 shrink-0" />
                               Certificados
                             </Link>
                           </NavigationMenuLink>
@@ -217,9 +221,9 @@ export function Navbar() {
                           <NavigationMenuLink asChild>
                             <Link
                               to="/admin/proyectos"
-                              className="block select-none rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground text-sm"
+                              className="flex items-center gap-2 select-none rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground text-sm"
                             >
-                              Proyectos
+                            <FolderKanban className="h-4 w-4 shrink-0" />Proyectos
                             </Link>
                           </NavigationMenuLink>
                         </li>
@@ -227,8 +231,9 @@ export function Navbar() {
                           <NavigationMenuLink asChild>
                             <Link
                               to="/admin/dna-config"
-                              className="block select-none rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground text-sm"
+                              className="flex items-center gap-2 select-none rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground text-sm"
                             >
+                            <Dna className="h-4 w-4 shrink-0" />
                               DNA Config
                             </Link>
                           </NavigationMenuLink>
@@ -237,9 +242,22 @@ export function Navbar() {
                           <NavigationMenuLink asChild>
                             <Link
                               to="/admin/wallet"
-                              className="block select-none rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground text-sm"
+                              className="flex items-center gap-2 select-none rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground text-sm"
                             >
+                            <Wallet2 className="h-4 w-4 shrink-0" />
                               Monedero Electrónico
+                            </Link>
+                          </NavigationMenuLink>
+                        </li>
+
+                        <li>
+                          <NavigationMenuLink asChild>
+                            <Link
+                              to="/admin/marketing"
+                              className="flex items-center gap-2 select-none rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground text-sm"
+                            >
+                            <Megaphone className="h-4 w-4 shrink-0" />
+                              Marketing
                             </Link>
                           </NavigationMenuLink>
                         </li>
@@ -252,6 +270,11 @@ export function Navbar() {
                             >
                               <MessageSquare className="h-4 w-4" />
                               Soporte en vivo
+                              {openConversationsCount > 0 && (
+                                <span className="ml-auto min-w-[20px] h-5 px-1.5 rounded-full bg-destructive text-destructive-foreground text-[11px] font-bold flex items-center justify-center">
+                                  {openConversationsCount > 99 ? "99+" : openConversationsCount}
+                                </span>
+                              )}
                             </Link>
                           </NavigationMenuLink>
                         </li>

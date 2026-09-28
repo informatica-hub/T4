@@ -2,7 +2,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { NucleotideBackground } from "@/components/ui/NucleotideBackground";
 import { Link } from "react-router-dom";
-import { PackageSearch, Award, Dna, BookOpen, FolderKanban } from "lucide-react";
+import { PackageSearch, Award, Dna, BookOpen, FolderKanban, Wallet2, Megaphone, MessageSquare } from "lucide-react";
 import { Seo } from "@/components/seo/Seo";
 
 const adminLinks = [
@@ -36,6 +36,27 @@ const adminLinks = [
     href: "/admin/dna-config",
     icon: Dna,
   },
+  {
+    title: "Monedero Electrónico",
+    description: "Gestión de Monederos Electrónicos",
+    href: "/admin/wallet",
+    icon: Wallet2,
+  },
+
+   {
+    title: "Marketing",
+    description: "Personaliza las campañas y productos relacionados",
+    href: "/admin/marketing",
+    icon: Megaphone,
+  },
+
+   {
+    title: "Soporte en vivo",
+    description: "Resuelve dudas al instante con el Chat En Vivo",
+    href: "/admin/support",
+    icon: MessageSquare,
+  },
+
 ];
 
 export default function AdminHome() {
