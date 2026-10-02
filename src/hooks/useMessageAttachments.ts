@@ -1,6 +1,7 @@
 // src/hooks/useMessageAttachments.ts
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";   // 👈 importa el hook de auth
 
 export interface Attachment {
   id: string;
@@ -17,7 +18,7 @@ export function useMessageAttachments(messageIds: string[]) {
   const [attachments, setAttachments] = useState<Record<string, Attachment[]>>({});
   const [loading, setLoading] = useState(false);
 
-  // Dependencia estable: string con todos los IDs ordenados
+  const { user } = useAuth();   // 👈 obtenemos el usuario actual
   const idsKey = [...messageIds].sort().join(",");
 
   useEffect(() => {
@@ -45,15 +46,22 @@ export function useMessageAttachments(messageIds: string[]) {
       // Generar URLs firmadas (bucket es privado)
       const withUrls: Attachment[] = await Promise.all(
         (data || []).map(async (att) => {
-          const { data: signed } = await supabase.storage
+          const { data: signed, error: signError } = await supabase.storage
             .from("chat-attachments")
-            .createSignedUrl(att.file_path, 3600); // 1 hora
+            .createSignedUrl(att.file_path, 3600);
+
+          if (signError) {
+            console.error(
+              "Error generando signed URL para:",
+              att.file_path,
+              signError
+            );
+          }
 
           return { ...att, signedUrl: signed?.signedUrl };
         })
       );
 
-      // Agrupar por message_id
       const grouped: Record<string, Attachment[]> = {};
       withUrls.forEach((att) => {
         if (!grouped[att.message_id]) grouped[att.message_id] = [];
@@ -65,7 +73,7 @@ export function useMessageAttachments(messageIds: string[]) {
     };
 
     fetchAttachments();
-  }, [idsKey]);
+  }, [idsKey, user?.id]);   // 👈 re-ejecuta cuando cambia el usuario
 
   return { attachments, loading };
 }

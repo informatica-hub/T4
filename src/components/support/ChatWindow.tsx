@@ -1,5 +1,5 @@
 // src/components/support/ChatWindow.tsx
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, Fragment } from "react";
 import {
   Send,
   X,
@@ -21,6 +21,7 @@ import { useMessageAttachments } from "@/hooks/useMessageAttachments";
 import { uploadAttachments } from "@/hooks/useUploadAttachments";
 import { supabase } from "@/integrations/supabase/client";
 import { useSupportStatus } from "@/hooks/useSupportStatus";
+import { formatMessageTimestamp } from '@/lib/formatTime';
 
 interface ChatWindowProps {
   conversationId: string;
@@ -86,6 +87,30 @@ export function ChatWindow({
     currentUserRole === "agent" ? "Soporte T4" : "Cliente";
 
   const { status: statusOverride } = useSupportStatus();
+
+  // ==========================================
+  // SEPARADORES DE FECHA
+  // Precalcula qué mensajes deben llevar separador de día.
+  // Solo se muestran si la conversación abarca más de un día.
+  // ==========================================
+  const multipleDays = useMemo(() => {
+    if (messages.length === 0) return false;
+    const first = new Date(messages[0].created_at).toDateString();
+    const last = new Date(
+      messages[messages.length - 1].created_at
+    ).toDateString();
+    return first !== last;
+  }, [messages]);
+
+  const messagesWithSeparators = useMemo(() => {
+    let lastDate = "";
+    return messages.map((msg) => {
+      const msgDate = new Date(msg.created_at).toDateString();
+      const showDateSeparator = msgDate !== lastDate;
+      lastDate = msgDate;
+      return { msg, showDateSeparator };
+    });
+  }, [messages]);
 
   // ==========================================
   // AUTO-SCROLL al último mensaje
@@ -216,6 +241,23 @@ useEffect(() => {
       }
     }
 
+
+          // ✅ NUEVO: notificar al cliente por email si es el primer mensaje del agente
+          //    en una conversación donde el cliente aún no ha escrito.
+          //    Fire-and-forget: no bloquea el reset del input ni la UI.
+          if (currentUserRole === "agent") {
+            supabase.functions
+              .invoke("notify-customer-new-message", {
+                body: { conversationId, messageId },
+              })
+              .then(({ error: fnError }) => {
+                if (fnError) console.warn("[notify-customer] fallo:", fnError);
+              })
+              .catch((e) => console.warn("[notify-customer] excepción:", e));
+          }
+
+
+
     setInput("");
     setSelectedFiles([]);
     setSending(false);
@@ -327,78 +369,140 @@ useEffect(() => {
           </div>
         ) : (
           <div className="space-y-4">
-            {messages.map((msg) => {
-              const isOwn = msg.sender_id === currentUserId;
+            {messagesWithSeparators.map(({ msg, showDateSeparator }) => {
+              // Orientación por ROL, no por usuario:
+              // - Vista agente → mensajes de agentes a la derecha
+              // - Vista cliente → mensajes del cliente a la derecha
+              const isOwn = msg.sender_role === currentUserRole;
               const name = senderNames[msg.sender_id] || "Usuario";
               const msgAttachments = attachments[msg.id] || [];
 
               return (
-                <div
-                  key={msg.id}
-                  className={cn(
-                    "flex items-end gap-2",
-                    isOwn ? "flex-row-reverse" : "flex-row"
+                <Fragment key={msg.id}>
+                  {/* SEPARADOR DE FECHA — solo si la conversación abarca más de un día */}
+                  {showDateSeparator && multipleDays && (
+                    <div className="flex justify-center my-3">
+                      <span className="text-[11px] bg-muted text-muted-foreground px-2.5 py-0.5 rounded-full capitalize">
+                        {new Date(msg.created_at).toLocaleDateString("es-MX", {
+                          weekday: "long",
+                          day: "numeric",
+                          month: "long",
+                        })}
+                      </span>
+                    </div>
                   )}
-                >
-                  <Avatar className="h-7 w-7 shrink-0">
-                    <AvatarFallback className="text-[10px]">
-                      {getInitials(name)}
-                    </AvatarFallback>
-                  </Avatar>
+
                   <div
                     className={cn(
-                      "max-w-[75%] rounded-2xl px-3 py-2 text-sm",
-                      isOwn
-                        ? "bg-primary text-primary-foreground rounded-br-sm"
-                        : "bg-muted text-foreground rounded-bl-sm"
+                      "flex items-end gap-2",
+                      isOwn ? "flex-row-reverse" : "flex-row"
                     )}
                   >
-                    {!isOwn && (
-                      <p className="text-[11px] font-semibold mb-0.5 opacity-70">
-                        {isOwn ? "Tú" : name.split(" ")[0]}
-                        {msg.sender_role === "agent" && " · Soporte"}
+                    <Avatar className="h-7 w-7 shrink-0">
+                      <AvatarFallback className="text-[10px]">
+                        {getInitials(name)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div
+                      className={cn(
+                        "max-w-[75%] rounded-2xl px-3 py-2 text-sm",
+                        isOwn
+                          ? "bg-primary text-primary-foreground rounded-br-sm"
+                          : "bg-muted text-foreground rounded-bl-sm"
+                      )}
+                    >
+                      {/* Nombre: se muestra cuando el mensaje viene del "otro lado",
+                          o cuando es de un agente (para distinguir qué admin respondió). */}
+                      {(!isOwn || msg.sender_role === "agent") && (
+                        <p className="text-[11px] font-semibold mb-0.5 opacity-70">
+                          {name.split(" ")[0]}
+                          {msg.sender_role === "agent" && " · Soporte"}
+                        </p>
+                      )}
+                      <p className="whitespace-pre-wrap break-words">
+                        {msg.content}
                       </p>
-                    )}
-                    <p className="whitespace-pre-wrap break-words">
-                      {msg.content}
-                    </p>
 
-                    {/* ADJUNTOS */}
-                    {msgAttachments.length > 0 && (
-                      <div className="mt-2 space-y-1">
-                        {msgAttachments.map((att) => {
-                          const isImage = att.mime_type.startsWith("image/");
-                          return (
-                            <a
-                              key={att.id}
-                              href={att.signedUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className={cn(
-                                "flex items-center gap-2 rounded-lg p-2 text-xs transition-colors",
-                                isOwn
-                                  ? "bg-primary-foreground/10 hover:bg-primary-foreground/20"
-                                  : "bg-background/50 hover:bg-background/80"
-                              )}
-                            >
-                              {isImage ? (
-                                <ImageIcon className="h-4 w-4 shrink-0" />
-                              ) : (
-                                <FileIcon className="h-4 w-4 shrink-0" />
-                              )}
-                              <span className="truncate flex-1">
-                                {att.file_name}
-                              </span>
-                              <span className="text-[10px] opacity-70 shrink-0">
-                                {formatFileSize(att.size_bytes)}
-                              </span>
-                            </a>
-                          );
-                        })}
-                      </div>
-                    )}
+                      {/* ADJUNTOS */}
+                      {msgAttachments.length > 0 && (
+                        <div className="mt-2 space-y-1">
+                          {msgAttachments.map((att) => {
+                            const isImage = att.mime_type.startsWith("image/");
+                            const canDownload = !!att.signedUrl;
+
+                            // Sin URL firmada → bloque deshabilitado, sin link roto
+                            if (!canDownload) {
+                              return (
+                                <div
+                                  key={att.id}
+                                  className={cn(
+                                    "flex items-center gap-2 rounded-lg p-2 text-xs opacity-50 cursor-not-allowed",
+                                    isOwn
+                                      ? "bg-primary-foreground/10"
+                                      : "bg-background/50"
+                                  )}
+                                  title="Archivo no disponible"
+                                >
+                                  {isImage ? (
+                                    <ImageIcon className="h-4 w-4 shrink-0" />
+                                  ) : (
+                                    <FileIcon className="h-4 w-4 shrink-0" />
+                                  )}
+                                  <span className="truncate flex-1">
+                                    {att.file_name}
+                                  </span>
+                                  <span className="text-[10px] opacity-70 shrink-0">
+                                    No disponible
+                                  </span>
+                                </div>
+                              );
+                            }
+
+                            return (
+                              <a
+                                key={att.id}
+                                href={att.signedUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className={cn(
+                                  "flex items-center gap-2 rounded-lg p-2 text-xs transition-colors",
+                                  isOwn
+                                    ? "bg-primary-foreground/10 hover:bg-primary-foreground/20"
+                                    : "bg-background/50 hover:bg-background/80"
+                                )}
+                              >
+                                {isImage ? (
+                                  <ImageIcon className="h-4 w-4 shrink-0" />
+                                ) : (
+                                  <FileIcon className="h-4 w-4 shrink-0" />
+                                )}
+                                <span className="truncate flex-1">
+                                  {att.file_name}
+                                </span>
+                                <span className="text-[10px] opacity-70 shrink-0">
+                                  {formatFileSize(att.size_bytes)}
+                                </span>
+                              </a>
+                            );
+                          })}
+                        </div>
+                      )}
+
+                      {/* HORA DEL MENSAJE */}
+                      <span
+                        className={cn(
+                          "block text-[10px] mt-1 text-right tabular-nums",
+                          isOwn
+                            ? "text-primary-foreground/70"
+                            : "text-muted-foreground"
+                        )}
+                        title={new Date(msg.created_at).toLocaleString("es-MX")}
+                      >
+                        {formatMessageTimestamp(msg.created_at)}
+                      </span>
+                    </div>
                   </div>
-                </div>
+                </Fragment>
               );
             })}
           </div>

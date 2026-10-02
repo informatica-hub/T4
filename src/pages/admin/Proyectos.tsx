@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { NucleotideBackground } from "@/components/ui/NucleotideBackground";
@@ -28,7 +28,7 @@ interface Attachment {
   file_name: string;
   size_bytes: number | null;
   mime_type: string | null;
-  kind: "user_excel" | "payment_proof"| "admin_quote";
+  kind: "user_excel" | "payment_proof" | "admin_quote";
   created_at: string;
 }
 
@@ -45,6 +45,8 @@ interface ProjectRow {
   created_at: string;
   has_update: boolean | null;
   attachments: Attachment[];
+  _searchText: string;
+  _cotNumbers: string[];
 }
 
 const STATUS_OPTIONS = [
@@ -63,6 +65,33 @@ const statusColor: Record<string, string> = {
 
 const MAX_QUOTE_SIZE = 20 * 1024 * 1024; // 20 MB
 
+// 👇 Helpers fuera del componente
+const COT_RE = /COT-(\d{5})/i;
+
+function buildRow(base: any, attachments: Attachment[]): ProjectRow {
+  const _searchText = [base.institution, base.laboratory, base.email]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+
+  const _cotNumbers = attachments
+    .map((a) => a.file_name?.match(COT_RE)?.[1])
+    .filter((n): n is string => Boolean(n));
+
+  return { ...base, attachments, _searchText, _cotNumbers };
+}
+
+function useDebouncedValue<T>(value: T, delay = 300): T {
+  const [v, setV] = useState(value);
+  useEffect(() => {
+    const t = setTimeout(() => setV(value), delay);
+    return () => clearTimeout(t);
+  }, [value, delay]);
+  return v;
+}
+
+const PAGE_SIZE = 50;
+
 export default function AdminProyectos() {
   const { user } = useAuth();
   const [rows, setRows] = useState<ProjectRow[]>([]);
@@ -72,6 +101,13 @@ export default function AdminProyectos() {
   const [openId, setOpenId] = useState<string | null>(null);
   const [uploadingId, setUploadingId] = useState<string | null>(null);
   const fileInputs = useRef<Record<string, HTMLInputElement | null>>({});
+
+  const debouncedSearch = useDebouncedValue(search, 300);
+
+  const [page, setPage] = useState(1);
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearch, statusFilter]);
 
   const load = async () => {
     setLoading(true);
@@ -85,10 +121,10 @@ export default function AdminProyectos() {
       return;
     }
     const atts = (attRes.data as Attachment[]) || [];
-    const merged: ProjectRow[] = ((reqRes.data as any[]) || []).map((r) => ({
-      ...r,
-      attachments: atts.filter((a) => a.project_request_id === r.id),
-    }));
+    const merged: ProjectRow[] = ((reqRes.data as any[]) || []).map((r) => {
+      const attachments = atts.filter((a) => a.project_request_id === r.id);
+      return buildRow(r, attachments);
+    });
     setRows(merged);
     setLoading(false);
   };
@@ -98,20 +134,40 @@ export default function AdminProyectos() {
   }, []);
 
   const filtered = useMemo(() => {
+    const q = debouncedSearch.trim().toLowerCase();
+    if (!q && statusFilter === "all") return rows;
+
+    const isNumeric = /^\d+$/.test(q);
+    const isCotPrefix = /^cot-?\d*$/i.test(q);
+    const cleanCot = isCotPrefix ? q.replace(/^cot-?/i, "") : "";
+
     return rows.filter((r) => {
       if (statusFilter !== "all" && r.status !== statusFilter) return false;
-      if (search) {
-        const q = search.toLowerCase();
-        if (
-          !r.institution.toLowerCase().includes(q) &&
-          !r.laboratory.toLowerCase().includes(q) &&
-          !r.email.toLowerCase().includes(q)
-        )
-          return false;
+      if (!q) return true;
+
+      if (r._searchText.includes(q)) return true;
+
+
+      if (isNumeric) {
+        return r._cotNumbers.some((n) => n.includes(q));
       }
-      return true;
+
+      if (isCotPrefix) {
+        return r._cotNumbers.some((n) => n.includes(cleanCot));
+      }
+
+      // 4) Búsqueda general en file_name
+      return r.attachments.some((a) =>
+        a.file_name?.toLowerCase().includes(q),
+      );
     });
-  }, [rows, search, statusFilter]);
+  }, [rows, debouncedSearch, statusFilter]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const paged = useMemo(
+    () => filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE),
+    [filtered, page],
+  );
 
   const updateStatus = async (id: string, status: string) => {
     const { error } = await supabase.from("project_requests").update({ status }).eq("id", id);
@@ -124,19 +180,19 @@ export default function AdminProyectos() {
   };
 
   const markAsReviewed = async (id: string) => {
-  const { error } = await supabase
-    .from("project_requests")
-    .update({ has_update: false } as any)
-    .eq("id", id);
-  if (error) {
-    toast.error("No se pudo marcar como revisado");
-    return;
-  }
-  setRows((prev) =>
-    prev.map((r) => (r.id === id ? { ...r, has_update: false } : r))
-  );
-  toast.success("Marcado como revisado");
-};
+    const { error } = await supabase
+      .from("project_requests")
+      .update({ has_update: false } as any)
+      .eq("id", id);
+    if (error) {
+      toast.error("No se pudo marcar como revisado");
+      return;
+    }
+    setRows((prev) =>
+      prev.map((r) => (r.id === id ? { ...r, has_update: false } : r))
+    );
+    toast.success("Marcado como revisado");
+  };
 
   const downloadAttachment = async (att: Attachment) => {
     const { data, error } = await supabase.storage
@@ -169,7 +225,7 @@ export default function AdminProyectos() {
     setRows((prev) =>
       prev.map((r) =>
         r.id === att.project_request_id
-          ? { ...r, attachments: r.attachments.filter((a) => a.id !== att.id) }
+          ? buildRow(r, r.attachments.filter((a) => a.id !== att.id))
           : r,
       ),
     );
@@ -218,7 +274,7 @@ export default function AdminProyectos() {
       if (inserted.length > 0) {
         setRows((prev) =>
           prev.map((r) =>
-            r.id === row.id ? { ...r, attachments: [...r.attachments, ...inserted] } : r,
+            r.id === row.id ? buildRow(r, [...r.attachments, ...inserted]) : r,
           ),
         );
         toast.success(`${inserted.length} documento(s) subido(s)`);
@@ -268,7 +324,7 @@ export default function AdminProyectos() {
             </CardTitle>
             <div className="flex flex-col md:flex-row gap-3 pt-3">
               <Input
-                placeholder="Buscar por institución, laboratorio o correo…"
+                placeholder="Buscar por institución, laboratorio, correo o cotización"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="md:max-w-md"
@@ -296,6 +352,7 @@ export default function AdminProyectos() {
                 No hay proyectos que coincidan con los filtros.
               </p>
             ) : (
+                <>
               <Table className="min-w-[1280px]">
                 <TableHeader>
                   <TableRow>
@@ -313,7 +370,7 @@ export default function AdminProyectos() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filtered.map((r) => {
+                  {paged.map((r) => {
                     const productsArr = Array.isArray(r.products) ? r.products : [];
                     const quoteAtts = r.attachments.filter((a) => a.kind === "admin_quote");
                     const userExcelAtts = r.attachments.filter((a) => a.kind === "user_excel");
@@ -321,8 +378,8 @@ export default function AdminProyectos() {
 
                     const isOpen = openId === r.id;
                     return (
-                      <>
-                        <TableRow key={r.id}>
+                      <Fragment key={r.id}>
+                        <TableRow>
                           <TableCell>
                             <Button
                               variant="ghost"
@@ -348,9 +405,9 @@ export default function AdminProyectos() {
                                 {r.has_update && (
                                   <span
                                     title="El cliente actualizó su solicitud"
-                                    className="inline-flex items-center justify-center h-5 w-5 rounded-full bg-red-500 text-white text-[10px] font-bold shadow-md animate-pulse shrink-0"> 1 
+                                    className="inline-flex items-center justify-center h-5 w-5 rounded-full bg-red-500 text-white text-[10px] font-bold shadow-md animate-pulse shrink-0"> 1
                                   </span>
-                                  
+
                                 )}
                               </div>
                           </TableCell>
@@ -541,16 +598,29 @@ export default function AdminProyectos() {
                                 </div>
                               </div>
                             </TableCell>
-                            
+
                           </TableRow>
                         )}
-                      </>
+                      </Fragment>
                     );
-                  })}
-                </TableBody>
-              </Table>
-            )}
-          </CardContent>
+})}
+        </TableBody>
+      </Table>
+
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4">
+        <span className="text-sm text-muted-foreground">
+          Página {page} de {totalPages} · {filtered.length} resultado{filtered.length === 1 ? "" : "s"}
+        </span>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" disabled={page === 1}
+            onClick={() => setPage((p) => Math.max(1, p - 1))}>Anterior</Button>
+          <Button variant="outline" size="sm" disabled={page === totalPages}
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}>Siguiente</Button>
+        </div>
+      </div>
+    </>
+  )}
+</CardContent>
         </Card>
       </div>
     </div>

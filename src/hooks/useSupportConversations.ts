@@ -1,6 +1,7 @@
 // src/hooks/useSupportConversations.ts
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { getClosedCutoffISO } from "@/lib/support/constants";
 
 export interface ConversationWithCustomer {
   id: string;
@@ -9,9 +10,11 @@ export interface ConversationWithCustomer {
   status: string;
   last_message_at: string;
   created_at: string;
+  closed_at?: string;
   customer_name: string;
   customer_email: string;
   last_message?: string;
+  last_message_role?: "customer" | "agent"; 
   unread_count?: number;
   last_agent_name?: string;
 }
@@ -50,7 +53,8 @@ export function useSupportConversations() {
   const [error, setError] = useState<string | null>(null);
 
   // ==========================================
-  // CARGAR TODAS las conversaciones (activas + cerradas)
+  // CARGAR TODAS las conversaciones (activas + cerradas recientes)
+  // Las cerradas de más de 30 días se excluyen con el filtro .or()
   // ==========================================
   const fetchAll = async () => {
     setLoading(true);
@@ -59,7 +63,9 @@ export function useSupportConversations() {
     const { data: convs, error: convError } = await supabase
       .from("conversations")
       .select("*")
-      .in("status", ["open", "assigned", "closed"])
+      .or(
+        `status.in.(open,assigned),and(status.eq.closed,closed_at.gte.${getClosedCutoffISO()})`
+      )
       .order("last_message_at", { ascending: false });
 
     if (convError) {
@@ -86,50 +92,67 @@ export function useSupportConversations() {
       (profiles || []).map((p) => [p.user_id, p])
     );
 
+    // 🆕 Obtener email de cada cliente vía RPC (solo admins pueden)
+    const emailMap = new Map<string, string>();
+    await Promise.all(
+      customerIds.map(async (id) => {
+        const { data: email } = await supabase.rpc("get_user_email", {
+          user_uuid: id,
+        });
+        if (email) emailMap.set(id, email);
+      })
+    );
+
     // Obtener el último mensaje de cada conversación
-const withDetails: ConversationWithCustomer[] = await Promise.all(
-  convs.map(async (conv) => {
-    // Último mensaje (para preview)
-    const { data: lastMsg } = await supabase
-      .from("messages")
-      .select("content")
-      .eq("conversation_id", conv.id)
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
+    const withDetails: ConversationWithCustomer[] = await Promise.all(
+      convs.map(async (conv) => {
+        // Último mensaje (para preview + saber quién lo envió)
+        // 👈 NUEVO: ahora traemos también sender_role
+        const { data: lastMsg } = await supabase
+          .from("messages")
+          .select("content, sender_role")
+          .eq("conversation_id", conv.id)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
 
-    // Último agente que respondió (si hay)
-    const { data: lastAgentMsg } = await supabase
-      .from("messages")
-      .select("sender_id")
-      .eq("conversation_id", conv.id)
-      .eq("sender_role", "agent")
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
+        // Último agente que respondió (si hay)
+        const { data: lastAgentMsg } = await supabase
+          .from("messages")
+          .select("sender_id")
+          .eq("conversation_id", conv.id)
+          .eq("sender_role", "agent")
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
 
-    const profile = profileMap.get(conv.customer_id);
+        const profile = profileMap.get(conv.customer_id);
 
-    // Resolver el nombre del último agente
-    let lastAgentName: string | undefined;
-    if (lastAgentMsg?.sender_id) {
-      const { data: agentProfile } = await supabase
-        .from("profiles")
-        .select("full_name")
-        .eq("user_id", lastAgentMsg.sender_id)
-        .maybeSingle();
-      lastAgentName = agentProfile?.full_name || undefined;
-    }
+        // Resolver el nombre del último agente
+        let lastAgentName: string | undefined;
+        if (lastAgentMsg?.sender_id) {
+          const { data: agentProfile } = await supabase
+            .from("profiles")
+            .select("full_name")
+            .eq("user_id", lastAgentMsg.sender_id)
+            .maybeSingle();
+          lastAgentName = agentProfile?.full_name || undefined;
+        }
 
-    return {
-      ...conv,
-      customer_name: profile?.full_name || profile?.company || "Cliente",
-      customer_email: "",
-      last_message: lastMsg?.content,
-      last_agent_name: lastAgentName,   // ← NUEVO
-    };
-  })
-);
+        return {
+          ...conv,
+          customer_name: profile?.full_name || profile?.company || "Cliente",
+          customer_email: emailMap.get(conv.customer_id) ?? "",
+          last_message: lastMsg?.content,
+          // 👈 NUEVO: guardamos el rol del último mensaje
+          last_message_role: (lastMsg?.sender_role as
+            | "customer"
+            | "agent"
+            | undefined) ?? undefined,
+          last_agent_name: lastAgentName,
+        };
+      })
+    );
 
     setConversations(withDetails);
     setLoading(false);
@@ -154,10 +177,14 @@ const withDetails: ConversationWithCustomer[] = await Promise.all(
       console.error("Error insertando mensaje de cierre:", msgError);
     }
 
-    // 2. Actualizar el estado de la conversación
+    // 2. Actualizar el estado + closed_at
+    const closedAt = new Date().toISOString();
     const { error: updateError } = await supabase
       .from("conversations")
-      .update({ status: "closed" })
+      .update({
+        status: "closed",
+        closed_at: closedAt,
+      })
       .eq("id", conversationId);
 
     if (updateError) {
@@ -168,7 +195,9 @@ const withDetails: ConversationWithCustomer[] = await Promise.all(
     // 3. Actualizar el estado local (mantener en la lista con status="closed")
     setConversations((prev) =>
       prev.map((c) =>
-        c.id === conversationId ? { ...c, status: "closed" } : c
+        c.id === conversationId
+          ? { ...c, status: "closed", closed_at: closedAt }
+          : c
       )
     );
 
@@ -233,6 +262,6 @@ const withDetails: ConversationWithCustomer[] = await Promise.all(
     loading,
     error,
     refresh: fetchAll,
-    closeConversation,   // ← ✅ ESTO FALTABA
+    closeConversation,
   };
 }

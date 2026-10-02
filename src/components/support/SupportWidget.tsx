@@ -3,7 +3,7 @@ import { useState, useEffect  } from "react";
 import { MessageSquare } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSupportConversation } from "@/hooks/useSupportConversation";
-import { useUnreadCount } from "@/hooks/useUnreadCount";
+import { useCustomerUnreadCount } from "@/hooks/useCustomerUnreadCount";
 import { ChatWindow } from "./ChatWindow";
 
 
@@ -18,7 +18,7 @@ export function SupportWidget({ initialOpen = false }: SupportWidgetProps) {
   const [open, setOpen] = useState(initialOpen);
   const { conversation, loading, createNewConversation } =
     useSupportConversation(open);
-  const { unreadCount } = useUnreadCount(conversation?.id ?? null, open);
+  const { unreadCount } = useCustomerUnreadCount(conversation?.id ?? null);
 
   
   // ✅ Si cambia `initialOpen` a true (por navegación), abrir el chat

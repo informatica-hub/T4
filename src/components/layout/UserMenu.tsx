@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { LogOut, FolderKanban, History, LogIn, Wallet2, Share2, Key, Wallet  } from "lucide-react";
+import { LogOut, FolderKanban, History, LogIn, Wallet2, Share2, Key, Wallet, Calculator} from "lucide-react";
 
 export function UserMenu() {
   const { user, profile, signOut } = useAuth();
@@ -111,6 +111,13 @@ export function UserMenu() {
             <Link to="/dashboard" className="flex items-center cursor-pointer">
               <Wallet2 className="mr-2 h-4 w-4" />
               Mi Monedero 
+            </Link>
+          </DropdownMenuItem>
+
+          <DropdownMenuItem asChild>
+            <Link to="/calculadora" className="flex items-center cursor-pointer">
+              <Calculator className="mr-2 h-4 w-4" />
+              Calculadora
             </Link>
           </DropdownMenuItem>
 

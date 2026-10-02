@@ -19,23 +19,29 @@ export function Layout() {
 
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Navbar />
-      <main className="flex-1 pt-16 md:pt-20">
-        <Outlet />
-      </main>
-      <PartnersStrip />
-      <Footer />
+  <div className="min-h-screen flex flex-col">
+    <Navbar />
+    <main className="flex-1 pt-16 md:pt-20">
+      <Outlet />
+    </main>
 
-      {!isSupportPanel && (
-        <>
-          {/* WhatsApp solo para visitantes (sin sesión) */}
-          {!user && <WhatsAppButton />}
+    {/* 👇 Ocultar aliados y footer en /admin/support */}
+    {!isSupportPanel && (
+      <>
+        <PartnersStrip />
+        <Footer />
+      </>
+    )}
 
-          {/* Chat para usuarios logueados, abriéndose si la URL lo pide */}
-          <SupportWidget initialOpen={shouldOpenChat} />
-        </>
-      )}
-    </div>
-  );
+    {!isSupportPanel && (
+      <>
+        {/* WhatsApp solo para visitantes (sin sesión) */}
+        {!user && <WhatsAppButton />}
+
+        {/* Chat para usuarios logueados, abriéndose si la URL lo pide */}
+        <SupportWidget initialOpen={shouldOpenChat} />
+      </>
+    )}
+  </div>
+);
 }
